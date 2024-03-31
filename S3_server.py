@@ -5,8 +5,8 @@ import sqlite3, json
 import S2_lib as invlib
 
 # (A2) FLASK SETTINGS + INIT
-# HOST_NAME = "localhost"
-# HOST_PORT = 80
+HOST_NAME = "localhost"
+HOST_PORT = 80
 DBFILE = "inventory.db"
 app = Flask(__name__)
 # app.debug = True
@@ -58,4 +58,4 @@ def rSaveMvt():
 
 # (D) START
 if __name__ == "__main__":
-    app.run(host='0.0.0.0',port='8080', ssl_context=('fullchain.pem', 'privkey.pem'))
+  app.run(HOST_NAME, HOST_PORT)
