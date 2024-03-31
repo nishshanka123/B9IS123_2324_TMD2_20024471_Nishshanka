@@ -1,6 +1,6 @@
 /* (A) MATERIAL ICONS */
 /* https://fonts.google.com/icons */
-.mi{font-family:"Material Icons";font-weight:400;font-style:normal;font-size:24px;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:"liga";-webkit-font-smoothing:antialiased}
+.mi{font-family:"Material Icons";font-weight:400;font-style:normal;font-size:24px;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:"liga";font-feature-settings: normal;-webkit-font-smoothing:antialiased}
 
 /* (B) ENTIRE PAGE */
 * {
