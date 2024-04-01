@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style-sub.css') }}">
+    <!--link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"-->
+    <!--link rel="stylesheet" href="../static/sub-style.css"-->
+    <title>Manage Devices</title>
+    <!-- further custom styles if required -->
+    <style>
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Manage Devices</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('manageDevices') }}">Devices</a></li>
+            <li><a href="{{ url_for('manageUsers') }}">Users</a></li>
+            <li><a href="{{ url_for('generateReports') }}">Reports</a></li>
+            <li><a href="{{ url_for('settings') }}">Settings</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <!-- replace following divs with flask implementation -->
+        <!-- @TODO: add if-else for page to handle the number of card containers -->
+        <div class="card">
+            {% block page_content_1 %}{% endblock %}
+        </div>
+        <div class="card">
+            {% block page_content_2 %}{% endblock %}
+        </div>
+        <div class="card">
+            {% block page_content_3 %}{% endblock %}
+        </div>
+        <div class="card">
+            {% block page_content_4 %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>
