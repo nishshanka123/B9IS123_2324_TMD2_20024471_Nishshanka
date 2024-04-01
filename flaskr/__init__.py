@@ -1,23 +1,59 @@
-from flask import Flask, render_template, request, session, redirect, url_for
-from flask_cors import CORS
-import mysql.connector
+from flask import Flask, render_template, g
+from . import db
+import secrets
+import string
+from .db import get_db
 
-app = Flask(__name__)
-CORS(app)
+def generate_secret_key(length=32):
+    alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-mysql = mysql.connector.connect(user='root', password='yash@1999',host='127.0.0.1',database='DIMS')
+def create_app():
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = generate_secret_key()
 
-app.secret_key = '12345'
+    app.config['MYSQL_HOST'] = 'localhost'
+    app.config['MYSQL_USER'] = 'nishshanka'
+    app.config['MYSQL_PASSWORD'] = 'malsara'
+    app.config['MYSQL_DB'] = 'DIMS'
 
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        cursor = mysql.cursor()
-        cursor.execute('SELECT * FROM USER WHERE username=%s AND password=%s', (username, password))
-        record = cursor.fetchone()
+    # Initialize the database
+    #db.init_app(app)
+
+    @app.route('/')
+    def index():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM test")
+        data = cursor.fetchall()
+        cursor.close()
+        return render_template('index.html', data=data)
+        #return data
+    
+    @app.route('/manage-devices')
+    def manageDevices():
+        return render_template('manage-devices.html')
+    
+    @app.route('/users')
+    def manageUsers():
+        return render_template('manage-users.html')
+    
+    @app.route('/generateReports')
+    def generateReports():
+        return render_template('generate-reports.html')
+    
+    @app.route('/settings')
+    def settings():
+        return render_template('settings.html')
+    
+    
+    
+
+    '''@app.route('/insert', methods=['POST'])
+    def insert():
+        db = get_db()
+        cursor = db.cursor()
+        # Retrieve data from the request and insert into the database
         cursor.close()
         
         if record:
