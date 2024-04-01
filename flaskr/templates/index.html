@@ -1,36 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Inventory Management System</title>
-    <!--link rel="stylesheet" href="./css/style-main.css"-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style-main.css') }}">
-</head>
-<body>
-    <div class="container">
-        <!--Try with static contents first.-->
-        <h1>Device Inventory Management System</h1>
-        <p>Manage your organization assets in single system.</p>
-        <form id="deviceForm">
-            <label for="deviceName">Device Name:</label>
-            <input type="text" id="deviceName" name="deviceName" required>
-            <label for="deviceType">Device Type:</label>
-            <input type="text" id="deviceType" name="deviceType" required>
-            <label for="deviceQuantity">Quantity:</label>
-            <input type="number" id="deviceQuantity" name="deviceQuantity" min="1" required>
-            <input type="submit" value="Add Device">
-        </form>
-        <div id="deviceList">
-            <h1>Data from Database</h1>
-            <table>
-                {% for item in data %}
-                    <tr><td>{{ item }}</td></tr>
-                {% endfor %}
-            </table>
-            <!-- Display the Device list -->
-        </div>
-    </div>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block header %}
+  <h1>{% block title %}List of devices{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div id="deviceList">
+        <h1>Data from Database</h1>
+        <table border="2">
+            {% for item in data %}
+                <tr><td>{{ item }}</td></tr>
+            {% endfor %}
+        </table>
+        <!-- Display the Device list -->
+    </div>
+</dev>
+{% endblock %}
