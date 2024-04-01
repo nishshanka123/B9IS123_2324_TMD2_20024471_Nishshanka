@@ -29,6 +29,25 @@ def create_app():
         cursor.close()
         return render_template('index.html', data=data)
         #return data
+    
+    @app.route('/manage-devices')
+    def manageDevices():
+        return render_template('manage-devices.html')
+    
+    @app.route('/users')
+    def manageUsers():
+        return render_template('manage-users.html')
+    
+    @app.route('/generateReports')
+    def generateReports():
+        return render_template('generate-reports.html')
+    
+    @app.route('/settings')
+    def settings():
+        return render_template('settings.html')
+    
+    
+    
 
     '''@app.route('/insert', methods=['POST'])
     def insert():

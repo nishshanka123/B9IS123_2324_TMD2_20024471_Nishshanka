@@ -1,1 +1,3 @@
-# This repository is for doing class aissgnments for PROGRAMMING FOR INFORMATION SYSTEMS (B9IS123_2324_TMD2)
+read me
+Run the application with debug
+$flask --app flaskr run --debug
