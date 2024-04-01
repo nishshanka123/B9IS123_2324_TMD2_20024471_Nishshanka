@@ -6,7 +6,7 @@
     <title>{% block title %}{% endblock %} - Flaskr</title>
     <!--title>Device Inventory Management System</title-->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="../static/style.css">
+    <!--link rel="stylesheet" href="../static/style.css"-->
 </head>
 <body>
     <header>
@@ -14,28 +14,29 @@
     </header>
     <nav>
         <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Devices</a></li>
-            <li><a href="#">Users</a></li>
-            <li><a href="#">Reports</a></li>
-            <li><a href="#">Settings</a></li>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('manageDevices') }}">Devices</a></li>
+            <li><a href="{{ url_for('manageUsers') }}">Users</a></li>
+            <li><a href="{{ url_for('generateReports') }}">Reports</a></li>
+            <li><a href="{{ url_for('settings') }}">Settings</a></li>
         </ul>
     </nav>
     <div class="container">
         <div class="card">
             <h2>Manage Devices</h2>
             <p>Add, edit, or delete devices in the system.</p>
-            <a href="#" class="btn">Go to Devices</a>
+            <!--a href="manage-devices.html" class="btn">Go to Devices</a-->
+            <a href="{{ url_for('manageDevices') }}"  class="btn">Register</a>
         </div>
         <div class="card">
             <h2>Manage Users</h2>
             <p>Add, edit, or delete users who can access the system.</p>
-            <a href="#" class="btn">Go to Users</a>
+            <a href="{{ url_for('manageUsers') }}" class="btn">Go to Users</a>
         </div>
         <div class="card">
             <h2>Generate Reports</h2>
             <p>Generate reports on device usage, user activity, etc.</p>
-            <a href="#" class="btn">Generate Reports</a>
+            <a href="{{ url_for('generateReports') }}" class="btn">Generate Reports</a>
         </div>
     </div>
     {% block content %}{% endblock %}

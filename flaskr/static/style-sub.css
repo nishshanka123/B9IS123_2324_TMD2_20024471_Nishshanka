@@ -1,5 +1,4 @@
-/* generic styling for base teplate */
-/* styling for main page sections */
+/* Custom styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -12,7 +11,6 @@ header {
     padding: 10px 0;
     text-align: center;
 }
-/* styling for navigation bar */
 nav {
     background-color: #333;
     color: white;
@@ -32,22 +30,17 @@ nav ul li a {
     color: white;
     text-decoration: none;
 }
-
-/* stulying for container div tag */
 .container {
     width: 80%;
     margin: 20px auto;
     overflow: hidden;
+    display:flex
 }
-
-/* stulying for container-card elements */
 .card {
+    flex: true;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    margin: 20px;
-    float: left;
-    width: calc(33.33% - 40px);
     padding: 20px;
     box-sizing: border-box;
 }
