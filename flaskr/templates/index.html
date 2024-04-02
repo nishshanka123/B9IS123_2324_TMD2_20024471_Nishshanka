@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}List of devices{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div id="deviceList">
+        <h1>Data from Database</h1>
+        <table border="2">
+            {% for item in data %}
+                <tr><td>{{ item }}</td></tr>
+            {% endfor %}
+        </table>
+        <!-- Display the Device list -->
+    </div>
+</dev>
+{% endblock %}
