@@ -9,10 +9,20 @@
     <div class="sub-card1">
         <h2>Add New Device</h2>
         <p>Use the form below to add a new device to the system:</p>
-        <form>
-            <label for="device_name">Device Name:</label>
+        <form id="deviceForm" action="/add" method="POST">
+            <label for="device_name">Device Name:</label><br>
             <input type="text" id="device_name" name="device_name" required><br><br>
-            <label for="device_type">Device Type:</label>
+            <label for="device_condition">Device Type:</label><br>
+            <select id="device_condition" name="device_condition" required>
+                <option value="new">New</option>
+                <option value="used">Used</option>
+                <option value="faulty">Faulty</option>
+            </select><br><br>
+            <label for="device_serial">Device Serial Number:</label><br>
+            <input type="text" id="device_serial" name="device_serial" required><br><br>
+            <label for="device_MD">Device Manufactured Date:</label><br>
+            <input type="text" id="device_MD" name="device_MD" required><br><br>
+            <label for="device_type">Device Type:</label><br>
             <select id="device_type" name="device_type" required>
                 <option value="phone">Phone</option>
                 <option value="laptop">Laptop</option>
@@ -29,10 +39,9 @@
         <h2>View Devices</h2>
         <p>View the list of devices currently registered in the system:</p>
         <div class="overlay" id="overlay"></div>
-        <button onClick="GetAllScanners()">Get All Scanners</button>
-        <br/>
-        <table id='tab1' bgcolor='gray' border="1">
-            <tr><td>Scanner ID</td><td>Scanner Type</td><td>Scanner Status</td></tr>
+        <button onClick="GetAllDevices()">Get All Devices</button><br><br>
+        <table id='tab1' bgcolor='white' border="1">
+            <tr><td>Device ID</td><td>Device Name</td><td>Device Condition</td></tr>
         </table>
     </div>
 {% endblock %}
