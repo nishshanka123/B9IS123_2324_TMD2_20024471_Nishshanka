@@ -6,32 +6,32 @@
 {% endblock %}
 
 {% block page_content_1 %}
-    <div class="sub-card1">
-        <h2>Add New Device</h2>
-        <p>Use the form below to add a new device to the system:</p>
-        <form id="deviceForm" action="/add" method="POST">
-            <label for="device_name">Device Name:</label><br>
-            <input type="text" id="device_name" name="device_name" required><br><br>
-            <label for="device_condition">Device Type:</label><br>
-            <select id="device_condition" name="device_condition" required>
-                <option value="new">New</option>
-                <option value="used">Used</option>
-                <option value="faulty">Faulty</option>
-            </select><br><br>
-            <label for="device_serial">Device Serial Number:</label><br>
-            <input type="text" id="device_serial" name="device_serial" required><br><br>
-            <label for="device_MD">Device Manufactured Date:</label><br>
-            <input type="text" id="device_MD" name="device_MD" required><br><br>
-            <label for="device_type">Device Type:</label><br>
-            <select id="device_type" name="device_type" required>
-                <option value="phone">Phone</option>
-                <option value="laptop">Laptop</option>
-                <option value="tablet">Tablet</option>
-                <!-- Add more options as needed -->
-            </select><br><br>
-            <button type="submit" class="btn">Add Device</button>
-        </form>
-    </div>
+<div class="sub-card1">
+    <h2 id="formTitle">Add New Device</h2>
+    <p>Use the form below to add a new device to the system:</p>
+    <form id="deviceForm" action="/add" method="POST">
+        <label for="device_name">Device Name:</label><br>
+        <input type="text" id="device_name" name="device_name" required><br><br>
+        <label for="device_condition">Device Condition:</label><br>
+        <select id="device_condition" name="device_condition" required>
+            <option value="new">New</option>
+            <option value="used">Used</option>
+            <option value="faulty">Faulty</option>
+        </select><br><br>
+        <label for="device_serial">Device Serial Number:</label><br>
+        <input type="text" id="device_serial" name="device_serial" required><br><br>
+        <label for="device_MD">Device Manufactured Date:</label><br>
+        <input type="text" id="device_MD" name="device_MD" required><br><br>
+        <label for="device_type">Device Type:</label><br>
+        <select id="device_type" name="device_type" required>
+            <option value="phone">Phone</option>
+            <option value="laptop">Laptop</option>
+            <option value="tablet">Tablet</option>
+            <!-- Add more options as needed -->
+        </select><br><br>
+        <button type="submit" class="btn" id="submitButton">Add Device</button>
+    </form>
+</div>
 {% endblock %}
 
 {% block page_content_2 %}
@@ -41,7 +41,12 @@
         <div class="overlay" id="overlay"></div>
         <button onClick="GetAllDevices()">Get All Devices</button><br><br>
         <table id='tab1' bgcolor='white' border="1">
-            <tr><td>Device ID</td><td>Device Name</td><td>Device Condition</td></tr>
+            <tr><td>Device ID</td><td>Device Name</td><td>Device Condition</td><td>Serial No</td><td>Manufacture Date</td><td>Device Type</td></tr>
         </table>
     </div>
+
+    <div id="popupMessage" class="popup">
+        <span id="messageText"></span>
+    </div>
 {% endblock %}
+
