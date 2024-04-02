@@ -5,6 +5,7 @@ import secrets
 import json
 import string
 from .db import get_db
+from datetime import date
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -51,20 +52,19 @@ def create_app():
     @app.route('/api/data')
     def get_data():
         student_data = fetch_scanner_data()
-        Results=[]
-        for row in student_data: #Format the Output Results and add to return string
-            Result={}
-            Result['Name']=row[1].replace('\n',' ')
-            Result['Condition']=row[2]
-            Result['ID']=row[0]
+        Results = []
+        for row in student_data:
+            Result = {
+                'ID': row[0],
+                'Name': row[1].replace('\n', ' '),
+                'Condition': row[2],
+                'Serial': row[3],
+                'Date': row[4],
+                'Type': row[5]
+            }
             Results.append(Result)
-        response={'Results':Results, 'count':len(Results)}
-        json_data=app.response_class(
-            response=json.dumps(response),
-            status=200,
-            mimetype='application/json'
-        )
-        return json_data
+        response = {'Results': Results, 'count': len(Results)}
+        return jsonify(response)  # Use jsonify to convert response to JSON
     
     def fetch_scanner_data():
         db = get_db()
@@ -121,16 +121,16 @@ def create_app():
         student_data = fetch_student_data()
         return  render_template('index.html', students = student_data)
     
-    @app.route('/delete-student/<int:student_id>', methods=['DELETE'])
-    def delete_student(scanner_id): 
+    @app.route('/delete_device/<int:device_id>', methods=['DELETE'])
+    def delete_device(device_id): 
         try:
             db = get_db()
             cursor = db.cursor()
-            cursor.execute("DELETE FROM Scanners WHERE scanner_id = %s", (scanner_id,))
+            cursor.execute("DELETE FROM Device WHERE device_id = %s", (device_id,))
             cursor.close()  # Close the cursor after use
-            return jsonify({"message": "Scanner deleted successfully"}), 200
+            return jsonify({"message": "Device deleted successfully"}), 200
         except Exception as e:
-            return jsonify({"error": "Failed to delete scanner record", "details": str(e)}), 500
+            return jsonify({"error": "Failed to delete Device record", "details": str(e)}), 500
 
 
     '''@app.route('/insert', methods=['POST'])
