@@ -59,3 +59,62 @@ nav ul li a {
     text-decoration: none;
     border-radius: 5px;
 }
+
+/* Popup container */
+.popup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    z-index: 1000;
+}
+/* Overlay behind the popup */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.id-column {
+    width: 150px; /* Set width for ID column */
+}
+
+.type-column {
+    width: 200px; /* Set width for Type column */
+}
+
+.status-column {
+    width: 200px; /* Set width for Status column */
+}
+
+.action-cell {
+    width: 200px; /* Set width for action cell */
+}
+
+.action-cell button {
+    margin-right: 10px; /* Add margin between buttons */
+    margin-left: 10px; 
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+}

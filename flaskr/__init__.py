@@ -1,9 +1,11 @@
 from flask import Flask, render_template, g, jsonify
 from . import db
+from flask import request
 import secrets
 import json
 import string
 from .db import get_db
+from datetime import date
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -50,29 +52,86 @@ def create_app():
     @app.route('/api/data')
     def get_data():
         student_data = fetch_scanner_data()
-        Results=[]
-        for row in student_data: #Format the Output Results and add to return string
-            Result={}
-            Result['Type']=row[1].replace('\n',' ')
-            Result['Status']=row[2]
-            Result['ID']=row[0]
+        Results = []
+        for row in student_data:
+            Result = {
+                'ID': row[0],
+                'Name': row[1].replace('\n', ' '),
+                'Condition': row[2],
+                'Serial': row[3],
+                'Date': row[4],
+                'Type': row[5]
+            }
             Results.append(Result)
-        response={'Results':Results, 'count':len(Results)}
-        json_data=app.response_class(
-            response=json.dumps(response),
-            status=200,
-            mimetype='application/json'
-        )
-        return json_data
+        response = {'Results': Results, 'count': len(Results)}
+        return jsonify(response)  # Use jsonify to convert response to JSON
     
     def fetch_scanner_data():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM Scanners")
+        cursor.execute("SELECT * FROM Device")
         data = cursor.fetchall()
         cursor.close()
 
         return data
+    
+    @app.route("/add", methods=['GET', 'POST']) #Add Student
+    def add_student():
+        
+        try: 
+            if request.method == 'POST':
+                device_name = request.form['device_name']
+                device_condition = request.form['device_condition']
+                device_serial = request.form['device_serial']
+                device_MD = request.form['device_MD']
+                device_type = request.form['device_type']
+                print(device_name,device_condition)
+
+                db = get_db()
+                cursor = db.cursor()
+                cursor.execute("INSERT INTO Device (device_name, device_condition, device_serial_no, device_manufactured_date, device_type) VALUES (%s, %s, %s, %s, %s)",(device_name, device_condition, device_serial, device_MD, device_type))
+                cursor.close()
+                return jsonify({"message": "Add scanner details successfully"}), 200
+            else:
+                return render_template('add.html')
+        except Exception as e:
+            return jsonify({"error": "Failed to ad device", "details": str(e)}), 500
+
+
+    @app.route('/api/update', methods=['POST'])
+    def update_student():
+
+        try:
+            if request.method == 'POST':
+                student_id = request.form['studentId']
+                first_name = request.form['name']
+                email = request.form['email']
+                print(first_name,email,student_id)
+
+                db = get_db()
+                cursor = db.cursor()
+                cursor.execute("UPDATE Scanners SET student_name = %s, student_email= %s WHERE student_id = %s",(first_name, email, student_id))
+                cursor.close()
+                return jsonify({"message": "Update scanner details successfully"}), 200
+            else:
+                return render_template('add.html')
+        except Exception as e:
+            return jsonify({"error": "Failed to update scanner details", "details": str(e)}), 500
+        
+        student_data = fetch_student_data()
+        return  render_template('index.html', students = student_data)
+    
+    @app.route('/delete_device/<int:device_id>', methods=['DELETE'])
+    def delete_device(device_id): 
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute("DELETE FROM Device WHERE device_id = %s", (device_id,))
+            cursor.close()  # Close the cursor after use
+            return jsonify({"message": "Device deleted successfully"}), 200
+        except Exception as e:
+            return jsonify({"error": "Failed to delete Device record", "details": str(e)}), 500
+
 
     '''@app.route('/insert', methods=['POST'])
     def insert():
