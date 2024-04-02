@@ -1,6 +1,7 @@
-from flask import Flask, render_template, g
+from flask import Flask, render_template, g, jsonify
 from . import db
 import secrets
+import json
 import string
 from .db import get_db
 
@@ -13,8 +14,8 @@ def create_app():
     app.config['SECRET_KEY'] = generate_secret_key()
 
     app.config['MYSQL_HOST'] = 'localhost'
-    app.config['MYSQL_USER'] = 'nishshanka'
-    app.config['MYSQL_PASSWORD'] = 'malsara'
+    app.config['MYSQL_USER'] = 'dbs'
+    app.config['MYSQL_PASSWORD'] = 'password'
     app.config['MYSQL_DB'] = 'DIMS'
 
     # Initialize the database
@@ -24,7 +25,7 @@ def create_app():
     def index():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM test")
+        cursor.execute("SELECT * FROM Scanners")
         data = cursor.fetchall()
         cursor.close()
         return render_template('index.html', data=data)
@@ -46,8 +47,32 @@ def create_app():
     def settings():
         return render_template('settings.html')
     
+    @app.route('/api/data')
+    def get_data():
+        student_data = fetch_scanner_data()
+        Results=[]
+        for row in student_data: #Format the Output Results and add to return string
+            Result={}
+            Result['Type']=row[1].replace('\n',' ')
+            Result['Status']=row[2]
+            Result['ID']=row[0]
+            Results.append(Result)
+        response={'Results':Results, 'count':len(Results)}
+        json_data=app.response_class(
+            response=json.dumps(response),
+            status=200,
+            mimetype='application/json'
+        )
+        return json_data
     
-    
+    def fetch_scanner_data():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM Scanners")
+        data = cursor.fetchall()
+        cursor.close()
+
+        return data
 
     '''@app.route('/insert', methods=['POST'])
     def insert():
