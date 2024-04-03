@@ -1,6 +1,6 @@
 from flask import Flask, render_template, g, jsonify
 from . import db
-from flask import request
+from flask import request, session, redirect, url_for
 import secrets
 import json
 import string
@@ -23,14 +23,40 @@ def create_app():
     # Initialize the database
     #db.init_app(app)
 
-    @app.route('/')
+    @app.route('/', methods=['GET', 'POST'])
+    def login():
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute('SELECT * FROM USER WHERE username=%s AND password=%s', (username, password))
+            record = cursor.fetchone()
+            cursor.close()
+
+            if record:
+                session['loggedin'] = True
+                session['username'] = username
+                return redirect(url_for('index'))
+            else:
+                msg = 'Incorrect Username or Password'
+                return render_template('login.html', msg=msg)
+        else:
+            return render_template('login.html')
+
+
+    @app.route('/index')
     def index():
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute("SELECT * FROM Scanners")
-        data = cursor.fetchall()
-        cursor.close()
-        return render_template('index.html', data=data)
+        if 'loggedin' in session:
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM Scanners")
+            data = cursor.fetchall()
+            cursor.close()
+            return render_template('index.html', data=data, username=session['username'])
+        else:
+            return redirect(url_for('login'))
         #return data
     
     @app.route('/manage-devices')
@@ -48,6 +74,10 @@ def create_app():
     @app.route('/settings')
     def settings():
         return render_template('settings.html')
+
+    @app.route('/logout')
+    def logout():
+        return render_template('login.html')
     
     @app.route('/api/data')
     def get_data():
@@ -132,7 +162,6 @@ def create_app():
         except Exception as e:
             return jsonify({"error": "Failed to delete Device record", "details": str(e)}), 500
 
-
     '''@app.route('/insert', methods=['POST'])
     def insert():
         db = get_db()
@@ -158,28 +187,5 @@ def create_app():
 
     return app
 
-
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port='8080')
-
-
-'''
-from flask import Flask, render_template
-from . import db
-
-def create_app():
-    app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'your_secret_key_here'
-
-    app.config['MYSQL_HOST'] = 'localhost'
-    app.config['MYSQL_USER'] = 'nishshanka'
-    app.config['MYSQL_PASSWORD'] = 'malsara'
-    app.config['MYSQL_DATABASE'] = 'DIMS'
-
-    @app.teardown_appcontext
-    def close_db(error):
-        db.close_db()
-
-    # Your routes and other configurations here...
-
-    return app'''
