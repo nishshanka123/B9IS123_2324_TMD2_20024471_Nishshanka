@@ -16,8 +16,8 @@ def create_app():
     app.config['SECRET_KEY'] = generate_secret_key()
 
     app.config['MYSQL_HOST'] = 'localhost'
-    app.config['MYSQL_USER'] = 'dbs'
-    app.config['MYSQL_PASSWORD'] = 'password'
+    app.config['MYSQL_USER'] = 'root'
+    app.config['MYSQL_PASSWORD'] = 'yash@1999'
     app.config['MYSQL_DB'] = 'DIMS'
 
     # Initialize the database
@@ -63,9 +63,43 @@ def create_app():
     def manageDevices():
         return render_template('manage-devices.html')
     
-    @app.route('/users')
+    def username_exists(username):
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM USER WHERE username=%s', (username,))
+        record = cursor.fetchone()
+        cursor.close()
+        return record is not None
+    
+    @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
-        return render_template('manage-users.html')
+        if request.method == 'POST':
+            username = request.form['create_username']
+            password = request.form['create_password']
+
+            if username_exists(username):
+                error_msg = 'Username already exists. Please use another Username.'
+                return render_template('manage-users.html', error_msg=error_msg)
+
+            if len(password) < 4:
+                error_msg = 'Password must be atleast 4 characters'
+                return render_template('manage-users.html', error_msg=error_msg)
+
+            db = get_db()
+            cursor = db.cursor()
+            try:
+                cursor.execute('INSERT INTO USER (username, password) VALUES (%s, %s)', (username, password))
+                db.commit()
+                msg = 'User registered successfully!'
+                return render_template('manage-users.html', msg=msg)
+            except Exception as e:
+                db.rollback()
+                error_msg = f'Error inserting user: {e}'
+                return render_template('manage-users.html', error_msg=error_msg, username=username, password=password)
+            finally:
+                cursor.close()
+        else:
+            return render_template('manage-users.html')
     
     @app.route('/generateReports')
     def generateReports():
