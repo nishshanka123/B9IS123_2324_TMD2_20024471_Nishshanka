@@ -107,19 +107,15 @@ def create_app():
                 device_serial = request.form['device_serial']
                 device_MD = request.form['device_MD']
                 device_type = request.form['device_type']
+                print(device_id)
 
                 db = get_db()
                 cursor = db.cursor()
                 cursor.execute("UPDATE Scanners SET device_name = %s, device_condition= %s device_serial_no = %s, device_manufactured_date= %s device_type = %s WHERE device_id = %s",(device_name, device_condition, device_serial, device_MD, device_type,  device_id))
                 cursor.close()
-                return jsonify({"message": "Update scanner details successfully"}), 200
-            else:
-                return render_template('add.html')
+                return jsonify({"message": "Update device details successfully"}), 200
         except Exception as e:
-            return jsonify({"error": "Failed to update scanner details", "details": str(e)}), 500
-        
-        student_data = fetch_student_data()
-        return  render_template('index.html', students = student_data)
+            return jsonify({"error": "Failed to update device details", "details": str(e)}), 500
     
     @app.route('/api/delete_device/<int:device_id>', methods=['DELETE'])
     def delete_device(device_id): 

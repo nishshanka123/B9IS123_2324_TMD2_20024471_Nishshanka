@@ -74,12 +74,20 @@
       else {
         // Delete successful
         showMessage('Device deleted successfully');
-          // Refresh student data table
-        refreshStudentTable();
+        clearTable()
+        GetAllDevices()
       }
       
     })
     .catch(error => console.error('Error:', error));
+}
+
+function clearTable() {
+  let table = document.getElementById("tab1");
+  // Remove all rows except the header row
+  while (table.rows.length > 1) {
+      table.deleteRow(1);
+  }
 }
 
 // Function to show popup message
@@ -149,6 +157,8 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(data => {
           // Display message to the user
           showMessage(data.message);
+          clearTable()
+          GetAllDevices()
       })
       .catch(error => {
           console.error('Error:', error);
