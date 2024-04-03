@@ -63,9 +63,27 @@ def create_app():
     def manageDevices():
         return render_template('manage-devices.html')
     
-    @app.route('/users')
+    @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
-        return render_template('manage-users.html')
+        if request.method == 'POST':
+            username = request.form['create_username']
+            password = request.form['create_password']
+
+            db = get_db()
+            cursor = db.cursor()
+            try:
+                cursor.execute('INSERT INTO USER (username, password) VALUES (%s, %s)', (username, password))
+                db.commit()
+                msg = 'User registered successfully!'
+                return render_template('manage-users.html', msg=msg)
+            except Exception as e:
+                db.rollback()
+                error_msg = f'Error inserting user: {e}'
+                return render_template('manage-users.html', error_msg=error_msg, username=username, password=password)
+            finally:
+                cursor.close()
+        else:
+            return render_template('manage-users.html')
     
     @app.route('/generateReports')
     def generateReports():
