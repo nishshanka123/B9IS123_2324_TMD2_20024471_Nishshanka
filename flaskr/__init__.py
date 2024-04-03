@@ -4,6 +4,7 @@ from flask import request
 import secrets
 import json
 import string
+import logging
 from .db import get_db
 from datetime import date
 
@@ -56,10 +57,10 @@ def create_app():
         for row in student_data:
             Result = {
                 'ID': row[0],
-                'Name': row[1].replace('\n', ' '),
+                'Name': row[1],
                 'Condition': row[2],
                 'Serial': row[3],
-                'Date': row[4],
+                'Date': row[4].strftime('%Y-%m-%d'),
                 'Type': row[5]
             }
             Results.append(Result)
@@ -97,24 +98,29 @@ def create_app():
 
 
     @app.route('/api/update', methods=['POST'])
-    def update_student():
-
+    def update_device():
         try:
             if request.method == 'POST':
-                device_id = request.form['device_Id']
+                device_id = request.form['device_id']
                 device_name = request.form['device_name']
                 device_condition = request.form['device_condition']
                 device_serial = request.form['device_serial']
                 device_MD = request.form['device_MD']
                 device_type = request.form['device_type']
+                print(device_name,device_condition)
                 print(device_id)
+                logging.info(f"Received update request for device ID: {device_id}")
 
                 db = get_db()
                 cursor = db.cursor()
-                cursor.execute("UPDATE Scanners SET device_name = %s, device_condition= %s device_serial_no = %s, device_manufactured_date= %s device_type = %s WHERE device_id = %s",(device_name, device_condition, device_serial, device_MD, device_type,  device_id))
+                cursor.execute("UPDATE Device SET device_name = %s, device_condition = %s, device_serial_no = %s, device_manufactured_date = %s, device_type = %s WHERE device_id = %s", (device_name, device_condition, device_serial, device_MD, device_type, device_id))
+                db.commit()  # Commit transaction
+
                 cursor.close()
+
                 return jsonify({"message": "Update device details successfully"}), 200
         except Exception as e:
+            logging.error(f"Failed to update device details: {str(e)}")
             return jsonify({"error": "Failed to update device details", "details": str(e)}), 500
     
     @app.route('/api/delete_device/<int:device_id>', methods=['DELETE'])

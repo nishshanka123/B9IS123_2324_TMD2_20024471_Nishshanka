@@ -1,6 +1,7 @@
 
   function GetAllDevices() {
-    let table = document.getElementById("tab1");
+    clearTable()
+    let table = document.getElementById("table1");
     let rows = table.getElementsByTagName('tr');
 
     fetch('/api/data')
@@ -123,7 +124,7 @@ function changeFormContent(selection, data) {
 
 // Function to populate form fields with data
 function populateForm(data) {
-    document.getElementById('device_Id').value = data['Id'];
+    document.getElementById('device_id').value = data['ID'];
     document.getElementById('device_name').value = data['Name'];
     document.getElementById('device_condition').value = data['Condition'];
     document.getElementById('device_serial').value = data['Serial'];
@@ -166,8 +167,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Function to display a message to the user
-  function showMessage(message) {
-      // Display the message in a popup or alert box
-      alert(message);
-  }
+  // function showMessage(message) {
+  //     // Display the message in a popup or alert box
+  //     alert(message);
+  // }
 });
