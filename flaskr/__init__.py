@@ -27,7 +27,7 @@ def create_app():
     def index():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM Scanners")
+        cursor.execute("SELECT * FROM Device")
         data = cursor.fetchall()
         cursor.close()
         return render_template('index.html', data=data)
@@ -75,7 +75,7 @@ def create_app():
 
         return data
     
-    @app.route("/add", methods=['GET', 'POST']) #Add Student
+    @app.route("/api/add", methods=['GET', 'POST']) #Add Student
     def add_student():
         
         try: 
@@ -91,9 +91,7 @@ def create_app():
                 cursor = db.cursor()
                 cursor.execute("INSERT INTO Device (device_name, device_condition, device_serial_no, device_manufactured_date, device_type) VALUES (%s, %s, %s, %s, %s)",(device_name, device_condition, device_serial, device_MD, device_type))
                 cursor.close()
-                return jsonify({"message": "Add scanner details successfully"}), 200
-            else:
-                return render_template('add.html')
+                return jsonify({"message": "Add Device details successfully"}), 200
         except Exception as e:
             return jsonify({"error": "Failed to ad device", "details": str(e)}), 500
 
@@ -103,14 +101,16 @@ def create_app():
 
         try:
             if request.method == 'POST':
-                student_id = request.form['studentId']
-                first_name = request.form['name']
-                email = request.form['email']
-                print(first_name,email,student_id)
+                device_id = request.form['device_Id']
+                device_name = request.form['device_name']
+                device_condition = request.form['device_condition']
+                device_serial = request.form['device_serial']
+                device_MD = request.form['device_MD']
+                device_type = request.form['device_type']
 
                 db = get_db()
                 cursor = db.cursor()
-                cursor.execute("UPDATE Scanners SET student_name = %s, student_email= %s WHERE student_id = %s",(first_name, email, student_id))
+                cursor.execute("UPDATE Scanners SET device_name = %s, device_condition= %s device_serial_no = %s, device_manufactured_date= %s device_type = %s WHERE device_id = %s",(device_name, device_condition, device_serial, device_MD, device_type,  device_id))
                 cursor.close()
                 return jsonify({"message": "Update scanner details successfully"}), 200
             else:
@@ -121,7 +121,7 @@ def create_app():
         student_data = fetch_student_data()
         return  render_template('index.html', students = student_data)
     
-    @app.route('/delete_device/<int:device_id>', methods=['DELETE'])
+    @app.route('/api/delete_device/<int:device_id>', methods=['DELETE'])
     def delete_device(device_id): 
         try:
             db = get_db()
