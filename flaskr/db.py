@@ -2,8 +2,8 @@ import mysql.connector
 from flask import g
 
 HOST = 'localhost'
-USER = 'nishshanka'
-PASSWORD = 'malsara'
+USER = 'root'
+PASSWORD = 'yash@1999'
 DATABASE = 'DIMS'
 
 
