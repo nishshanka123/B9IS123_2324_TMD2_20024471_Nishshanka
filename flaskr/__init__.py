@@ -15,11 +15,10 @@ def login():
         username = request.form['username']
         password = request.form['password']
         
-        # Authenticate user - Example using MySQL
         cursor = mysql.cursor()
         cursor.execute('SELECT * FROM USER WHERE username=%s AND password=%s', (username, password))
         record = cursor.fetchone()
-        cursor.close()  # Close the cursor after using it
+        cursor.close()
         
         if record:
             session['loggedin'] = True
@@ -57,6 +56,11 @@ def generateReports():
 @app.route('/settings')
 def settings():
     return render_template('settings.html')
+
+@app.route('/logout')
+def logout():
+    return render_template('login.html')
+
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port='8080')
