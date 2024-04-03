@@ -7,22 +7,70 @@
 
 {% block page_content_1 %}
     <div class="sub-card1">
-        <h2>Register New User</h2>
-        <form action="{{url_for('manageUsers')}}" method="post">
-            <label for="create_username">Create User Name:</label>
-            <input type="text" id="create_username" name="create_username" required><br><br>
-            <label for="create_password">Create Password:</label>
-            <input type="text" id="create_password" name="create_password" required><br><br>
-            <button type="submit" class="btn">Register</button>
+        <h2>Reports</h2>
+        <p>Use the form below to add a new device to the system:</p>
+        <form>
+            <label for="device_name">Device Name:</label>
+            <input type="text" id="device_name" name="device_name" required><br><br>
+            <label for="device_type">Device Type:</label>
+            <select id="device_type" name="device_type" required>
+                <option value="phone">Phone</option>
+                <option value="laptop">Laptop</option>
+                <option value="tablet">Tablet</option>
+                <!-- Add more options as needed -->
+            </select><br><br>
+            <button type="submit" class="btn">Add Device</button>
         </form>
+    </div>
+{% endblock %}
 
-        {% if error_msg %}
-            <p style="color: red;">{{ error_msg }}</p>
-        {% endif %}
+{% block page_content_2 %}
+    <div class="sub-card1">
+        <h2>Reports</h2>
+        <p>Use the form below to add a new device to the system:</p>
+        <form>
+            <label for="device_name">Device Name:</label>
+            <input type="text" id="device_name" name="device_name" required><br><br>
+            <label for="device_type">Device Type:</label>
+            <select id="device_type" name="device_type" required>
+                <option value="phone">Phone</option>
+                <option value="laptop">Laptop</option>
+                <option value="tablet">Tablet</option>
+                <!-- Add more options as needed -->
+            </select><br><br>
+            <button type="submit" class="btn">Add Device</button>
+        </form>
+    </div>
+{% endblock %}
 
-        {% if msg %}
-            <p style="color: green;">{{ msg }}</p>
-        {% endif %}
-        
+{% block page_content_3 %}
+    <div class="sub-card1">
+        <h2>Reports</h2>
+        <p>Use the form below to add a new device to the system:</p>
+        <form>
+            <label for="device_name">Device Name:</label>
+            <input type="text" id="device_name" name="device_name" required><br><br>
+            <label for="device_type">Device Type:</label>
+            <select id="device_type" name="device_type" required>
+                <option value="phone">Phone</option>
+                <option value="laptop">Laptop</option>
+                <option value="tablet">Tablet</option>
+                <!-- Add more options as needed -->
+            </select><br><br>
+            <button type="submit" class="btn">Add Device</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block page_content_4 %}
+    <div class="sub-card1">
+        <h2>View Devices</h2>
+        <p>View the list of devices currently registered in the system:</p>
+        <ul>
+            <li>Device 1</li>
+            <li>Device 2</li>
+            <li>Device 3</li>
+            <!-- Add more device entries as needed -->
+        </ul>
     </div>
 {% endblock %}

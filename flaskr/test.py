@@ -8,8 +8,8 @@ def get_db_connection():
   try:
     dims_db_con = mysql.connector.connect(
       host = "127.0.0.1",
-      user = "root",
-      password = "yash@1999",
+      user = "nishshanka",
+      password = "malsara",
       database = "DIMS",
       port = "3306"
     )

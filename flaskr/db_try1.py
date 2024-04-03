@@ -34,8 +34,8 @@ def get_db_connection():
     if 'dims_db_con' not in g:
         g.dims_db_con = mysql.connector.connect(
         host="localhost",
-        user="root",
-        password="yash@1999",
+        user="nishshanka",
+        password="malsara",
         database="DIMS"
     )
     g.cursor = g.dims_db_con.cursor(dictionary=True)
