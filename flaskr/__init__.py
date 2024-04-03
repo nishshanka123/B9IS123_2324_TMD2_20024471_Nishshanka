@@ -1,9 +1,9 @@
 from flask import Flask, render_template, g
-#from . import db
+from . import db
 import secrets
 import string
-#from .db import get_db
-from flaskr.db import get_db, close_db
+from .db import get_db
+
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
     return ''.join(secrets.choice(alphabet) for _ in range(length))
