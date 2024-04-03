@@ -63,11 +63,27 @@ def create_app():
     def manageDevices():
         return render_template('manage-devices.html')
     
+    def username_exists(username):
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM USER WHERE username=%s', (username,))
+        record = cursor.fetchone()
+        cursor.close()
+        return record is not None
+    
     @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
         if request.method == 'POST':
             username = request.form['create_username']
             password = request.form['create_password']
+
+            if username_exists(username):
+                error_msg = 'Username already exists. Please use another Username.'
+                return render_template('manage-users.html', error_msg=error_msg)
+
+            if len(password) < 4:
+                error_msg = 'Password must be atleast 4 characters'
+                return render_template('manage-users.html', error_msg=error_msg)
 
             db = get_db()
             cursor = db.cursor()
