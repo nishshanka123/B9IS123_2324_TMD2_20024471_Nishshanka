@@ -137,4 +137,8 @@ CREATE TABLE `CompanyManufacturedDevice` (
   KEY `FKey` (`EmployeeID`, `ProjectID`)
 );
 
+alter table User add column username VARCHAR(45);
+update User set username="admin" where UserID=1;
+select * from User;
+
 

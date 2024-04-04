@@ -4,6 +4,7 @@ from flask import request, session, redirect, url_for
 import secrets
 import json
 import string
+import logging
 from .db import get_db
 from datetime import date
 
@@ -49,25 +50,55 @@ def create_app():
 
     @app.route('/index')
     def index():
-        if 'loggedin' in session:
-            db = get_db()
-            cursor = db.cursor()
-            cursor.execute("SELECT * FROM Scanners")
-            data = cursor.fetchall()
-            cursor.close()
-            return render_template('index.html', data=data, username=session['username'])
-        else:
-            return redirect(url_for('login'))
-            #return render_template('index.html')
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM Device")
+        data = cursor.fetchall()
+        cursor.close()
+        return render_template('index.html', data=data)
         #return data
     
     @app.route('/manage-devices')
     def manageDevices():
         return render_template('manage-devices.html')
     
-    @app.route('/users')
+    def username_exists(username):
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM User WHERE username=%s', (username,))
+        record = cursor.fetchone()
+        cursor.close()
+        return record is not None
+    
+    @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
-        return render_template('manage-users.html')
+        if request.method == 'POST':
+            username = request.form['create_username']
+            password = request.form['create_password']
+
+            if username_exists(username):
+                error_msg = 'Username already exists. Please use another Username.'
+                return render_template('manage-users.html', error_msg=error_msg)
+
+            if len(password) < 4:
+                error_msg = 'Password must be atleast 4 characters'
+                return render_template('manage-users.html', error_msg=error_msg)
+
+            db = get_db()
+            cursor = db.cursor()
+            try:
+                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, password))
+                db.commit()
+                msg = 'User registered successfully!'
+                return render_template('manage-users.html', msg=msg)
+            except Exception as e:
+                db.rollback()
+                error_msg = f'Error inserting user: {e}'
+                return render_template('manage-users.html', error_msg=error_msg, username=username, password=password)
+            finally:
+                cursor.close()
+        else:
+            return render_template('manage-users.html')
     
     @app.route('/generateReports', methods=['GET', 'POST'])
     def generateReports():
@@ -92,22 +123,22 @@ def create_app():
     
     @app.route('/api/data')
     def get_data():
-        student_data = fetch_scanner_data()
+        device_data = fetch_device_data()
         Results = []
-        for row in student_data:
+        for row in device_data:
             Result = {
                 'ID': row[0],
-                'Name': row[1].replace('\n', ' '),
+                'Name': row[1],
                 'Condition': row[2],
                 'Serial': row[3],
-                'Date': row[4],
+                'Date': row[4].strftime('%Y-%m-%d'),
                 'Type': row[5]
             }
             Results.append(Result)
         response = {'Results': Results, 'count': len(Results)}
         return jsonify(response)  # Use jsonify to convert response to JSON
     
-    def fetch_scanner_data():
+    def fetch_device_data():
         db = get_db()
         cursor = db.cursor()
         cursor.execute("SELECT * FROM Device")
@@ -116,7 +147,7 @@ def create_app():
 
         return data
     
-    @app.route("/add", methods=['GET', 'POST']) #Add Student
+    @app.route("/api/add", methods=['GET', 'POST']) #Add Student
     def add_student():
         
         try: 
@@ -132,37 +163,38 @@ def create_app():
                 cursor = db.cursor()
                 cursor.execute("INSERT INTO Device (device_name, device_condition, device_serial_no, device_manufactured_date, device_type) VALUES (%s, %s, %s, %s, %s)",(device_name, device_condition, device_serial, device_MD, device_type))
                 cursor.close()
-                return jsonify({"message": "Add scanner details successfully"}), 200
-            else:
-                return render_template('add.html')
+                return jsonify({"message": "Add Device details successfully"}), 200
         except Exception as e:
             return jsonify({"error": "Failed to ad device", "details": str(e)}), 500
 
 
     @app.route('/api/update', methods=['POST'])
-    def update_student():
-
+    def update_device():
         try:
             if request.method == 'POST':
-                student_id = request.form['studentId']
-                first_name = request.form['name']
-                email = request.form['email']
-                print(first_name,email,student_id)
+                device_id = request.form['device_id']
+                device_name = request.form['device_name']
+                device_condition = request.form['device_condition']
+                device_serial = request.form['device_serial']
+                device_MD = request.form['device_MD']
+                device_type = request.form['device_type']
+                print(device_name,device_condition)
+                print(device_id)
+                logging.info(f"Received update request for device ID: {device_id}")
 
                 db = get_db()
                 cursor = db.cursor()
-                cursor.execute("UPDATE Scanners SET student_name = %s, student_email= %s WHERE student_id = %s",(first_name, email, student_id))
+                cursor.execute("UPDATE Device SET device_name = %s, device_condition = %s, device_serial_no = %s, device_manufactured_date = %s, device_type = %s WHERE device_id = %s", (device_name, device_condition, device_serial, device_MD, device_type, device_id))
+                db.commit()  # Commit transaction
+
                 cursor.close()
-                return jsonify({"message": "Update scanner details successfully"}), 200
-            else:
-                return render_template('add.html')
+
+                return jsonify({"message": "Update device details successfully"}), 200
         except Exception as e:
-            return jsonify({"error": "Failed to update scanner details", "details": str(e)}), 500
-        
-        student_data = fetch_student_data()
-        return  render_template('index.html', students = student_data)
+            logging.error(f"Failed to update device details: {str(e)}")
+            return jsonify({"error": "Failed to update device details", "details": str(e)}), 500
     
-    @app.route('/delete_device/<int:device_id>', methods=['DELETE'])
+    @app.route('/api/delete_device/<int:device_id>', methods=['DELETE'])
     def delete_device(device_id): 
         try:
             db = get_db()
