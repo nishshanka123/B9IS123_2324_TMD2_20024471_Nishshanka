@@ -32,7 +32,7 @@ def create_app():
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute('SELECT * FROM USER WHERE username=%s AND password=%s', (username, password))
+            cursor.execute('SELECT * FROM User WHERE username=%s AND password=%s', (username, password))
             record = cursor.fetchone()
             cursor.close()
 
@@ -64,7 +64,7 @@ def create_app():
     def username_exists(username):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM USER WHERE username=%s', (username,))
+        cursor.execute('SELECT * FROM User WHERE username=%s', (username,))
         record = cursor.fetchone()
         cursor.close()
         return record is not None

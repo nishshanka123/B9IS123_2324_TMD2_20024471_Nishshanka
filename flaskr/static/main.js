@@ -1,6 +1,6 @@
 
   function GetAllDevices() {
-    //clearTable()
+    clearTable()
     let table = document.getElementById("table1");
     let rows = table.getElementsByTagName('tr');
 
@@ -84,11 +84,12 @@
 }
 
 function clearTable() {
-  let table = document.getElementById("tab1");
+  let table = document.getElementById("table1");
   // Remove all rows except the header row
   while (table.rows.length > 1) {
-      table.deleteRow(1);
+    table.deleteRow(1);
   }
+  
 }
 
 // Function to show popup message
