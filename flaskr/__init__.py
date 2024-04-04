@@ -17,8 +17,8 @@ def create_app():
     app.config['SECRET_KEY'] = generate_secret_key()
 
     app.config['MYSQL_HOST'] = 'localhost'
-    app.config['MYSQL_USER'] = 'root'
-    app.config['MYSQL_PASSWORD'] = 'yash@1999'
+    app.config['MYSQL_USER'] = 'dbs'
+    app.config['MYSQL_PASSWORD'] = 'password'
     app.config['MYSQL_DB'] = 'DIMS'
 
     # Initialize the database
@@ -113,9 +113,9 @@ def create_app():
     
     @app.route('/api/data')
     def get_data():
-        student_data = fetch_device_data()
+        device_data = fetch_device_data()
         Results = []
-        for row in student_data:
+        for row in device_data:
             Result = {
                 'ID': row[0],
                 'Name': row[1],

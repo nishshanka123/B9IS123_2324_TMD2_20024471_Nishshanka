@@ -1,6 +1,6 @@
 
   function GetAllDevices() {
-    clearTable()
+    //clearTable()
     let table = document.getElementById("table1");
     let rows = table.getElementsByTagName('tr');
 
