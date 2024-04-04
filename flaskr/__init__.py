@@ -113,9 +113,9 @@ def create_app():
     
     @app.route('/api/data')
     def get_data():
-        student_data = fetch_device_data()
+        device_data = fetch_device_data()
         Results = []
-        for row in student_data:
+        for row in device_data:
             Result = {
                 'ID': row[0],
                 'Name': row[1],
@@ -137,8 +137,8 @@ def create_app():
 
         return data
     
-    @app.route("/api/add", methods=['GET', 'POST']) #Add Student
-    def add_student():
+    @app.route("/api/add", methods=['GET', 'POST']) #Add Device
+    def add_device():
         
         try: 
             if request.method == 'POST':
