@@ -49,24 +49,12 @@ def create_app():
 
     @app.route('/index')
     def index():
-<<<<<<< HEAD
         db = get_db()
         cursor = db.cursor()
         cursor.execute("SELECT * FROM Device")
         data = cursor.fetchall()
         cursor.close()
         return render_template('index.html', data=data)
-=======
-        if 'loggedin' in session:
-            db = get_db()
-            cursor = db.cursor()
-            cursor.execute("SELECT * FROM Scanners")
-            data = cursor.fetchall()
-            cursor.close()
-            return render_template('index.html', data=data, username=session['username'])
-        else:
-            return redirect(url_for('login'))
->>>>>>> B9IS123_2324_TMD2_PROGRAMMING_FOR_IS_GRP_CA2_dev
         #return data
     
     @app.route('/manage-devices')
@@ -125,7 +113,7 @@ def create_app():
     
     @app.route('/api/data')
     def get_data():
-        student_data = fetch_scanner_data()
+        student_data = fetch_device_data()
         Results = []
         for row in student_data:
             Result = {
@@ -140,7 +128,7 @@ def create_app():
         response = {'Results': Results, 'count': len(Results)}
         return jsonify(response)  # Use jsonify to convert response to JSON
     
-    def fetch_scanner_data():
+    def fetch_device_data():
         db = get_db()
         cursor = db.cursor()
         cursor.execute("SELECT * FROM Device")
