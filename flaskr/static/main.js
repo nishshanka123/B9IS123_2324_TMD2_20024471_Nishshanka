@@ -44,6 +44,56 @@
         });
   }
 
+  function SearchDevices() {
+    clearTable();
+    let table = document.getElementById("table1");
+    let rows = table.getElementsByTagName('tr');
+    let search_value = document.getElementById("search_input").value.trim();
+
+    if (search_value) {
+      console.log(search_value);
+        fetch(`/api/search/${search_value}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            data.Results.forEach(x => {
+                let newRow = rows[0].cloneNode(true);
+                let divs = newRow.getElementsByTagName('td');
+                divs[0].innerHTML = x['ID'];
+                divs[1].innerHTML = x['Name'];
+                divs[2].innerHTML = x['Condition'];
+                divs[3].innerHTML = x['Serial'];
+                divs[4].innerHTML = x['Date'];
+                divs[5].innerHTML = x['Type'];
+
+                // Assign CSS classes to each column
+                // divs[0].classList.add('id-column');
+                // divs[1].classList.add('type-column');
+                // divs[2].classList.add('status-column');
+
+                // Create and append edit and delete buttons to the row
+                let editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.addEventListener('click', () => editDevice(x));
+
+                let deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => deleteDevice(x['ID']));
+
+                let actionCell = document.createElement('td');
+                actionCell.classList.add('action-cell');
+                actionCell.appendChild(editButton);
+                actionCell.appendChild(deleteButton);
+
+                newRow.appendChild(actionCell);
+
+                table.appendChild(newRow);
+            });
+        });
+    }
+  }
+
+
   function addDevice() {
 
   }
