@@ -204,6 +204,40 @@ def create_app():
             return jsonify({"message": "Device deleted successfully"}), 200
         except Exception as e:
             return jsonify({"error": "Failed to delete Device record", "details": str(e)}), 500
+        
+    @app.route('/api/search/<string:search_value>')
+    def search_device(search_value): 
+        
+        try:
+            db = get_db()
+            with db.cursor() as cursor:
+                # Parameterized query to avoid SQL injection
+                #cursor.execute("SELECT * FROM Device WHERE device_name = %s", (search_value,))
+                cursor.execute("SELECT * FROM Device WHERE device_name = %s OR device_condition = %s OR device_serial_no = %s OR device_type = %s", (search_value, search_value, search_value, search_value))
+                device_data = cursor.fetchall()  # Fetch the results before closing the cursor
+            
+            Results = []
+            print(device_data)
+            
+            Results = []
+            for row in device_data:
+                print(row[0])
+                Result = {
+                    'ID': row[0],
+                    'Name': row[1],
+                    'Condition': row[2],
+                    'Serial': row[3],
+                    'Date': row[4].strftime('%Y-%m-%d'),
+                    'Type': row[5]
+                }
+                Results.append(Result)
+            response = {'Results': Results, 'count': len(Results)}
+            print(response)
+            return jsonify(response)  # Use jsonify to convert response to JSON
+        
+        except Exception as e:
+            return jsonify({"error": "Failed to search for devices", "details": str(e)}), 500
+
 
     '''@app.route('/insert', methods=['POST'])
     def insert():
