@@ -37,6 +37,7 @@ nav ul li a {
     display:flex
 }
 .card {
+    width: 100%;
     flex: true;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -52,10 +53,24 @@ nav ul li a {
     font-size: 16px;
     margin-bottom: 20px;
 }
+.card select {
+    background-color: #7e7878;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
 .btn {
     background-color: #333;
     color: white;
     padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+.btn2 {
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
     text-decoration: none;
     border-radius: 5px;
 }
