@@ -52,7 +52,7 @@ def create_app():
     
     @app.route('/api/data')
     def get_data():
-        student_data = fetch_scanner_data()
+        student_data = fetch_device_data()
         Results = []
         for row in student_data:
             Result = {
@@ -67,7 +67,7 @@ def create_app():
         response = {'Results': Results, 'count': len(Results)}
         return jsonify(response)  # Use jsonify to convert response to JSON
     
-    def fetch_scanner_data():
+    def fetch_device_data():
         db = get_db()
         cursor = db.cursor()
         cursor.execute("SELECT * FROM Device")
