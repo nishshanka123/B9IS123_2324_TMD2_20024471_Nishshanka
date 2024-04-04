@@ -28,20 +28,8 @@
         </ul>
     </nav>
     <div class="container">
-        <!-- replace following divs with flask implementation -->
-        <!-- @TODO: add if-else for page to handle the number of card containers -->
-        <div class="card">
-            {% block page_content_1 %}{% endblock %}
-        </div>
-        <div class="card">
-            {% block page_content_2 %}{% endblock %}
-        </div>
-        <!-- <div class="card">
-            {% block page_content_3 %}{% endblock %}
-        </div>
-        <div class="card">
-            {% block page_content_4 %}{% endblock %}
-        </div> -->
+        {% block page_content_1 %}{% endblock %}
+        
     </div>
 </body>
 </html>

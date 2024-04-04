@@ -66,8 +66,8 @@ CREATE TABLE `Device` (
 
 CREATE TABLE `DeviceServiceRequest` (
   `RequestID` INT,
-  `IssueDetail` XML(ISSUE-DETAIL),
-  `DeviceDetail` XML(DEV-DETAIL),
+  `IssueDetail` VARCHAR(100),
+  `DeviceDetail` VARCHAR(100),
   `IssueDate` DATETIME,
   `Severity` VARCHAR(20),
   `Status` VARCHAR(40),
@@ -77,16 +77,17 @@ CREATE TABLE `DeviceServiceRequest` (
 );
 
 CREATE TABLE `User` (
-  `UserID` INT,
+  `UserID` INT auto_increment,
   `DIMSRole` VARCHAR(20),
   `EmployeeID` INT,
+  `Password` VARCHAR(20),
   KEY `PKey` (`UserID`),
   KEY `FKey` (`EmployeeID`)
 );
 
 CREATE TABLE `Employee` (
   `EmployeeID` INT,
-  `Name` VARCHAR(40,
+  `Name` VARCHAR(40),
   `Address` VARCHAR(60),
   `ContactNo` VARCHAR(15),
   `Designation` VARCHAR(15),
@@ -105,10 +106,12 @@ CREATE TABLE `ThirdpartyDevice` (
   `Description` VARCHAR(40),
   `PurchasedDate` DATE,
   `ProjectID` VARCHAR(10),
-  `CountryBranchCode` VARCHAR(10),
-  FOREIGN KEY (`SerialNo`) REFERENCES `Employee`(`AssetNo`),
+  `BranchID` VARCHAR(5),
+  `EmployeeID` INT,
+  FOREIGN KEY (`EmployeeID`) REFERENCES `Employee`(`EmployeeID`),
+  FOREIGN KEY (`BranchID`) REFERENCES `Branch`(`BranchID`),
   KEY `PKey` (`SerialNo`),
-  KEY `FKey` (`ProjectID`, `CountryBranchCode`)
+  KEY `FKey` (`ProjectID`, `BranchID`)
 );
 
 CREATE TABLE `ElectronicVastage` (
@@ -126,10 +129,12 @@ CREATE TABLE `CompanyManufacturedDevice` (
   `FirmwareVersion` VARCHAR(10),
   `ManufactureDate` DATE,
   `ModelNumber` VARCHAR(10),
-  `ProjectID` VARCHAR(10),
-  FOREIGN KEY (`SerialNo`) REFERENCES `Employee`(`AssetNo`),
+  `EmployeeID` INT,
+  `ProjectID` INT,
+  FOREIGN KEY (`EmployeeID`) REFERENCES `Employee`(`EmployeeID`),
   FOREIGN KEY (`ProjectID`) REFERENCES `Project`(`ProjectID`),
   KEY `PKey` (`SerialNo`),
-  KEY `FKey` (`ModelNumber`, `ProjectID`)
+  KEY `FKey` (`EmployeeID`, `ProjectID`)
 );
+
 

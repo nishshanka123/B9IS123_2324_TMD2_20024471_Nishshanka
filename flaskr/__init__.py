@@ -31,7 +31,7 @@ def create_app():
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute('SELECT * FROM USER WHERE username=%s AND password=%s', (username, password))
+            cursor.execute('SELECT * FROM User WHERE username=%s AND password=%s', (username, password))
             record = cursor.fetchone()
             cursor.close()
 
@@ -44,6 +44,7 @@ def create_app():
                 return render_template('login.html', msg=msg)
         else:
             return render_template('login.html')
+            #return render_template('index.html')
 
 
     @app.route('/index')
@@ -57,6 +58,7 @@ def create_app():
             return render_template('index.html', data=data, username=session['username'])
         else:
             return redirect(url_for('login'))
+            #return render_template('index.html')
         #return data
     
     @app.route('/manage-devices')
@@ -67,8 +69,17 @@ def create_app():
     def manageUsers():
         return render_template('manage-users.html')
     
-    @app.route('/generateReports')
+    @app.route('/generateReports', methods=['GET', 'POST'])
     def generateReports():
+        if request.method == 'POST':
+            catagory = request.form['device_catagory']
+            type = request.form['device_type']
+            country = request.form['country']
+            department = request.form['department']            
+            # write database queries and data retrival here
+            select_q = "SELECT * FROM xxxxxx"
+        else:
+            data = None
         return render_template('generate-reports.html')
     
     @app.route('/settings')
