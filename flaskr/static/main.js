@@ -1,6 +1,7 @@
 
-function GetAllDevices() {
-    let table = document.getElementById("tab1");
+  function GetAllDevices() {
+    clearTable()
+    let table = document.getElementById("table1");
     let rows = table.getElementsByTagName('tr');
 
     fetch('/api/data')
@@ -25,7 +26,7 @@ function GetAllDevices() {
                 // Create and append edit and delete buttons to the row
                 let editButton = document.createElement('button');
                 editButton.textContent = 'Edit';
-                editButton.addEventListener('click', () => editDeice(x));
+                editButton.addEventListener('click', () => editDevice(x));
 
                 let deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
@@ -41,27 +42,27 @@ function GetAllDevices() {
                 table.appendChild(newRow);
             });
         });
-}
-
-  function DeleteRows() {
-    let table=document.getElementById("tab1");
-    let rowCount = table.rows.length;
-
-    // Loop through all rows in reverse order and remove each row
-    for (let i = rowCount - 1; i > 0; i--) {
-        table.deleteRow(i);
-    }
   }
 
-  function editDeice(data) {
+  function addDevice() {
+
+  }
+
+  function editDevice(data) {
     changeFormContent('edit',data)
+
+  }
+
+  function addDevice() {
+    changeFormContent('add')
+
   }
   
  
   
   function deleteDevice(id) {
     console.log(id);
-    fetch(`/delete_device/${id}`, {
+    fetch(`/api/delete_device/${id}`, {
       method: 'DELETE',
     })
     .then(response => {
@@ -74,12 +75,20 @@ function GetAllDevices() {
       else {
         // Delete successful
         showMessage('Device deleted successfully');
-          // Refresh student data table
-        refreshStudentTable();
+        clearTable()
+        GetAllDevices()
       }
       
     })
     .catch(error => console.error('Error:', error));
+}
+
+function clearTable() {
+  let table = document.getElementById("tab1");
+  // Remove all rows except the header row
+  while (table.rows.length > 1) {
+      table.deleteRow(1);
+  }
 }
 
 // Function to show popup message
@@ -95,6 +104,7 @@ function showMessage(message) {
 }
 
 function changeFormContent(selection, data) {
+  console.log(selection);
     var formTitle = document.getElementById('formTitle');
     var submitButton = document.getElementById('submitButton');
     var deviceForm = document.getElementById('deviceForm');
@@ -102,18 +112,19 @@ function changeFormContent(selection, data) {
     if (selection === 'add') {
         formTitle.textContent = 'Add New Device';
         submitButton.textContent = 'Add Device';
-        deviceForm.action = '/add'; // Update form action
+        deviceForm.action = '/api/add'; // Update form action
         clearForm(); // Clear form fields
     } else if (selection === 'edit') {
         formTitle.textContent = 'Edit Device';
         submitButton.textContent = 'Update Device';
-        deviceForm.action = '/update'; // Update form action
+        deviceForm.action = '/api/update'; // Update form action
         populateForm(data); // Populate form fields with data
     }
 }
 
 // Function to populate form fields with data
 function populateForm(data) {
+    document.getElementById('device_id').value = data['ID'];
     document.getElementById('device_name').value = data['Name'];
     document.getElementById('device_condition').value = data['Condition'];
     document.getElementById('device_serial').value = data['Serial'];
@@ -129,3 +140,35 @@ function clearForm() {
     document.getElementById('device_MD').value = '';
     document.getElementById('device_type').value = 'phone';
 }
+
+// Function to handle form submission
+document.addEventListener('DOMContentLoaded', function() {
+  // Place your JavaScript code here
+  document.getElementById('deviceForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+      var formData = new FormData(this); // Get form data
+
+      var api = document.getElementById('deviceForm').action
+      // Send form data to the API endpoint
+      fetch(api, {
+          method: 'POST',
+          body: formData
+      })
+      .then(response => response.json()) // Parse response JSON
+      .then(data => {
+          // Display message to the user
+          showMessage(data.message);
+          clearTable()
+          GetAllDevices()
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+  });
+
+  // Function to display a message to the user
+  // function showMessage(message) {
+  //     // Display the message in a popup or alert box
+  //     alert(message);
+  // }
+});

@@ -8,8 +8,9 @@
 {% block page_content_1 %}
 <div class="sub-card1">
     <h2 id="formTitle">Add New Device</h2>
-    <p>Use the form below to add a new device to the system:</p>
-    <form id="deviceForm" action="/add" method="POST">
+    <p>Use the form below to add or update device information:</p>
+    <form id="deviceForm" action="/api/add" method="POST">
+        <input type="hidden" id="device_id" name="device_id">
         <label for="device_name">Device Name:</label><br>
         <input type="text" id="device_name" name="device_name" required><br><br>
         <label for="device_condition">Device Condition:</label><br>
@@ -21,7 +22,7 @@
         <label for="device_serial">Device Serial Number:</label><br>
         <input type="text" id="device_serial" name="device_serial" required><br><br>
         <label for="device_MD">Device Manufactured Date:</label><br>
-        <input type="text" id="device_MD" name="device_MD" required><br><br>
+        <input type="date" id="device_MD" name="device_MD" required><br><br>
         <label for="device_type">Device Type:</label><br>
         <select id="device_type" name="device_type" required>
             <option value="phone">Phone</option>
@@ -30,6 +31,7 @@
             <!-- Add more options as needed -->
         </select><br><br>
         <button type="submit" class="btn" id="submitButton">Add Device</button>
+        <button type="button" onclick="addDevice()">Clear</button>
     </form>
 </div>
 {% endblock %}
@@ -40,7 +42,10 @@
         <p>View the list of devices currently registered in the system:</p>
         <div class="overlay" id="overlay"></div>
         <button onClick="GetAllDevices()">Get All Devices</button><br><br>
-        <table id='tab1' bgcolor='white' border="1">
+        <label for="search">Serch:</label>
+        <input type="text" id="search_input" name="search_input">
+        <input type="submit"><br><br>
+        <table id='table1' bgcolor='white' border="1">
             <tr><td>Device ID</td><td>Device Name</td><td>Device Condition</td><td>Serial No</td><td>Manufacture Date</td><td>Device Type</td></tr>
         </table>
     </div>
