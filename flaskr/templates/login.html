@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style-mainpage.css')}}">
 </head>
 <body>
-  <h1>Login Page</h1>
-  <form action="{{url_for('login')}}" method="post">
-    <label>Username</label>
-      <input type="text" name="username" id="username" required>
-      <label>Password</label>
-      <input type="password" name="password" id="password" required>
-      <input type="submit" value="Login">
+  <form class="login-form" action="{{ url_for('login') }}" method="post">
+    <h1>Login Page</h1>
+    <label class="form-label">Username</label>
+    <input class="form-input" type="text" name="username" id="username" required>
+    <label class="form-label">Password</label>
+    <input class="form-input" type="password" name="password" id="password" required>
+    <input class="form-submit" type="submit" value="Login">
   </form>
-  
 </body>
 </html>
