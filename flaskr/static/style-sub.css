@@ -60,6 +60,12 @@ nav ul li a {
     text-decoration: none;
     border-radius: 5px;
 }
+
+.disabled a {
+    color: #999;
+    pointer-events: none;
+}
+
 .btn {
     background-color: #333;
     color: white;
