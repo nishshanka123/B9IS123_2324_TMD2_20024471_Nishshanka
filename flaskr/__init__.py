@@ -32,21 +32,23 @@ def create_app():
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute('SELECT * FROM User WHERE username=%s AND password=%s', (username, password))
-            record = cursor.fetchone()
+            cursor.execute('SELECT username, role FROM User WHERE username=%s AND password=%s', (username, password))
+            user = cursor.fetchone()
             cursor.close()
 
-            if record:
-                session['loggedin'] = True
-                session['username'] = username
-                return redirect(url_for('index'))
+            if user:
+                session['username'] = user[0]
+                session['role'] = user[1]
+
+                if session['role'] == 'admin':
+                    return redirect(url_for('index'))
+                else:
+                    return redirect(url_for('index'))
             else:
                 msg = 'Incorrect Username or Password'
                 return render_template('login.html', msg=msg)
         else:
             return render_template('login.html')
-            #return render_template('index.html')
-
 
     @app.route('/index')
     def index():
@@ -119,6 +121,7 @@ def create_app():
 
     @app.route('/logout')
     def logout():
+        session.clear()
         return render_template('login.html')
     
     @app.route('/api/data')
