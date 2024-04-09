@@ -239,25 +239,6 @@ def create_app():
             return jsonify({"error": "Failed to search for devices", "details": str(e)}), 500
 
 
-    '''@app.route('/insert', methods=['POST'])
-    def insert():
-        db = get_db()
-        cursor = db.cursor()
-        # Retrieve data from the request and insert into the database
-        cursor.close()
-        db.commit()
-        return redirect(url_for('index'))'''
-
-    '''@app.route('/select')
-    def select():
-        db = get_db()
-        cursor = db.cursor()
-        # Execute select query and fetch data
-        cursor.execute("SELECT * FROM test")
-        data = cursor.fetchall()
-        cursor.close()
-        return render_template('select.html', data=data)'''
-
     @app.teardown_appcontext
     def close_db(error):
         db.close_db()
