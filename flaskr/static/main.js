@@ -1,22 +1,24 @@
 
-  function GetAllDevices() {
+  function GetAllHomeDevices() {
     clearTable()
     let table = document.getElementById("table1");
     let rows = table.getElementsByTagName('tr');
 
-    fetch('/api/data')
+    fetch('/api/get_home_devices')
         .then(response => response.json())
         .then(data => {
             console.log(data);
             data.Results.forEach(x => {
                 let newRow = rows[0].cloneNode(true);
                 let divs = newRow.getElementsByTagName('td');
-                divs[0].innerHTML = x['ID'];
-                divs[1].innerHTML = x['Name'];
-                divs[2].innerHTML = x['Condition'];
-                divs[3].innerHTML = x['Serial'];
-                divs[4].innerHTML = x['Date'];
-                divs[5].innerHTML = x['Type'];
+                divs[0].innerHTML = x['AssertNo'];
+                divs[1].innerHTML = x['DeviceName'];
+                divs[2].innerHTML = x['DeviceCondition'];
+                divs[3].innerHTML = x['DeviceType'];
+                divs[4].innerHTML = x['DeviceSerial'];
+                divs[5].innerHTML = x['DeviceFirmware'];
+                divs[6].innerHTML = x['ManufacturedDate'];
+                divs[7].innerHTML = x['ModelNumber'];
 
                 // Assign CSS classes to each column
                 // divs[0].classList.add('id-column');
@@ -30,7 +32,7 @@
 
                 let deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => deleteDevice(x['ID']));
+                deleteButton.addEventListener('click', () => deleteDevice(x['AssertNo']));
 
                 let actionCell = document.createElement('td');
                 actionCell.classList.add('action-cell');
@@ -126,7 +128,7 @@
         // Delete successful
         showMessage('Device deleted successfully');
         clearTable()
-        GetAllDevices()
+        GetAllHomeDevices()
       }
       
     })
@@ -194,7 +196,7 @@ function clearForm() {
 
 // Function to handle form submission
 document.addEventListener('DOMContentLoaded', function() {
-  GetAllDevices();
+  GetAllHomeDevices();
   // Place your JavaScript code here
   document.getElementById('deviceForm').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent default form submission
@@ -211,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // Display message to the user
           showMessage(data.message);
           clearTable()
-          GetAllDevices()
+          GetAllHomeDevices()
       })
       .catch(error => {
           console.error('Error:', error);

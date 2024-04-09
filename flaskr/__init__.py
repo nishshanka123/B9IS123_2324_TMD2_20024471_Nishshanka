@@ -32,15 +32,15 @@ def create_app():
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute('SELECT username, role FROM User WHERE username=%s AND password=%s', (username, password))
+            cursor.execute('SELECT username, DIMSRole FROM User WHERE username=%s AND password=%s', (username, password))
             user = cursor.fetchone()
             cursor.close()
 
             if user:
                 session['username'] = user[0]
-                session['role'] = user[1]
+                session['DIMSRole'] = user[1]
 
-                if session['role'] == 'admin':
+                if session['DIMSRole'] == 'admin':
                     return redirect(url_for('index'))
                 else:
                     return redirect(url_for('index'))
@@ -124,27 +124,29 @@ def create_app():
         session.clear()
         return render_template('login.html')
     
-    @app.route('/api/data')
-    def get_data():
-        device_data = fetch_device_data()
+    @app.route('/api/get_home_devices')
+    def get_home_devices():
+        device_data = fetch_home_device_data()
         Results = []
         for row in device_data:
             Result = {
-                'ID': row[0],
-                'Name': row[1],
-                'Condition': row[2],
-                'Serial': row[3],
-                'Date': row[4].strftime('%Y-%m-%d'),
-                'Type': row[5]
+                'AssertNo': row[0],
+                'DeviceName': row[1],
+                'DeviceCondition': row[2],
+                'DeviceType': row[3],
+                'DeviceSerial': row[4],
+                'DeviceFirmware': row[5],
+                'ManufacturedDate': row[6].strftime('%Y-%m-%d'),
+                'ModelNumber': row[7]
             }
             Results.append(Result)
         response = {'Results': Results, 'count': len(Results)}
         return jsonify(response)  # Use jsonify to convert response to JSON
     
-    def fetch_device_data():
+    def fetch_home_device_data():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM Device")
+        cursor.execute("SELECT d.assetNo, d.device_name, d.device_condition, d.device_type, cm.SerialNo, cm.FirmwareVersion, cm.ManufactureDate, cm.ModelNumber FROM CompanyManufacturedDevice as cm, Device as d where cm.AssetNo = d.AssetNo")
         data = cursor.fetchall()
         cursor.close()
 
