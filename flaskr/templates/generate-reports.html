@@ -10,10 +10,11 @@
 {% endblock %}
 
 {% block page_content_1 %}
-        <div class="report-container">
+        <div class="report-container" id="test1">
             <div class="box-search">
                 <h2>Device Allocation and Destribution Reports</h2>                
-                <form action="{{url_for('generateReports')}}" method="post">
+                
+                <form id="report-form">
                     <label for="device_catagory">Device Catagory:</label>                
                     <select id="device_catagory" name="device_catagory" required>
                         <option value="all">All</option>
@@ -48,19 +49,22 @@
                 </form>
             </div>
 
-            {% if response %}            
-            <div class="box-report">
-                <table id="report-table"></table> <!-- Empty table to be populated with data -->
+            <!--div for the report-->          
+            <div class="box-report" id="box-report-1">
+                <table id="report-table">
+                {% if response %}   
+                     <!-- Empty table to be populated with data -->
+                {% endif %}
+                </table>
             </div>
             <script>
                 // Call the fetchAndRenderTable function when the page loads
-                window.onload = function() {
-                    fetchAndRenderTable();
-                    //RetrieveReport();
-                };
+                //window.onload = function() {
+                //    fetchAndRenderTable();
+                //};
             </script>
-            {% endif %}
-            </div>
+            
+        </div>
 
 {% endblock %}
 
