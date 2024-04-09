@@ -194,6 +194,7 @@ function clearForm() {
 
 // Function to handle form submission
 document.addEventListener('DOMContentLoaded', function() {
+  GetAllDevices();
   // Place your JavaScript code here
   document.getElementById('deviceForm').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent default form submission
