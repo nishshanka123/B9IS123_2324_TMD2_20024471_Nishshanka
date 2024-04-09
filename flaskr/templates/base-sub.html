@@ -22,7 +22,11 @@
         <ul>
             <li><a href="{{ url_for('index') }}">Home</a></li>
             <li><a href="{{ url_for('manageDevices') }}">Devices</a></li>
+            {% if session['role'] == 'admin' %}
             <li><a href="{{ url_for('manageUsers') }}">Users</a></li>
+            {% else %}
+            <li class="disabled"><a href="#">Users</a></li>
+            {% endif %}
             <li><a href="{{ url_for('generateReports') }}">Reports</a></li>
             <li><a href="{{ url_for('settings') }}">Settings</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>

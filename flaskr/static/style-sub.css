@@ -89,6 +89,11 @@ nav ul li a {
   }
   
 
+.disabled a {
+    color: #999;
+    pointer-events: none;
+}
+
 .btn {
     background-color: #333;
     color: white;
