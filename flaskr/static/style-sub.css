@@ -61,6 +61,61 @@ nav ul li a {
     border-radius: 5px;
 }
 
+.report-container {
+    display: flex;
+    flex-direction: column; /* Vertical layout */
+  }
+  
+.report-container .box {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+.report-container .box-search {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+  }
+  
+.report-container .box-report {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(225, 241, 242, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+/* Table styles for report*/
+.box-report table {
+    width: 100%;
+    border-collapse: collapse;
+}
+  
+.box-report  table th,
+  table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+  
+  /* Header row styles */
+.box-report  table th {
+    background-color: #f2f2f2;
+}
+  
+  /* Alternate row colors */
+.box-report table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+  
+  /* Hover effect on rows */
+.box-report table tr:hover {
+    background-color: #e6e6e6;
+}
+
 .disabled a {
     color: #999;
     pointer-events: none;

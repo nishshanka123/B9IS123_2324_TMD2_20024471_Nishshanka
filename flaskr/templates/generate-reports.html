@@ -2,7 +2,7 @@
 {% extends 'base-sub.html' %}
 
 {% block header %}
-  <h1>{% block title %}Mange Reporting{% endblock %}</h1>
+  <h1>{% block title %}Manage DIMS Report{% endblock %}</h1>
 {% endblock %}
 
 {% block header1 %}
@@ -10,45 +10,62 @@
 {% endblock %}
 
 {% block page_content_1 %}
-    <div class="card">
-        <div class="sub-card1">
-            <h2>Device Allocation and Destribution Reports</h2>
-            <form action="{{url_for('generateReports')}}" method="post">
-                <label for="device_catagory">Device Catagory:</label>                
-                <select id="device_catagory" name="device_catagory" required>
-                    <option value="all">All</option>
-                    <option value="3rd_party">Third Party</option>
-                    <option value="mfactured">Manufactured</option>                    
-                </select>&nbsp;
-                <label for="device_type">Device Name:</label>
-                <select id="device_type" name="device_type" required>
-                    <option value="all">All</option>
-                    <option value="scanner">Scanner</option>
-                    <option value="laptop">Laptop</option>
-                    <option value="tablet">Tablet</option>
-                    <option value="m_phone">Mobile Phone</option>
-                    <option value="pc_laptop">Laptop</option>
-                    <option value="tablet">Tablet</option>
-                </select>&nbsp;
-                <label for="country">Country:</label>
-                <select id="country" name="country" optional>
-                    <option value="c_all">All</option>
-                    <option value="c_usa">USA</option>
-                    <option value="c_caneda">Canada</option>
-                    <option value="c_uk">UK</option>
-                </select>&nbsp;
-                <label for="department">Department:</label>
-                <select id="department" name="department" optional>
-                    <option value="d_all">All</option>
-                    <option value="engineering">Engineering</option>
-                    <option value="manuf">Manufacturing</option>
-                    <option value="it">IT</option>
-                </select>&nbsp;
-                <button type="submit" class="btn2">Generate Report</button>
+        <div class="report-container" id="test1">
+            <div class="box-search">
+                <h2>Device Allocation and Destribution Reports</h2>                
                 
-            </form>
+                <form id="report-form">
+                    <label for="device_catagory">Device Catagory:</label>                
+                    <select id="device_catagory" name="device_catagory" required>
+                        <option value="all">All</option>
+                        <option value="3rd_party">Third Party</option>
+                        <option value="mfactured">Manufactured</option>                    
+                    </select>&nbsp;
+                    <label for="device_type">Device Name:</label>
+                    <select id="device_type" name="device_type" required>
+                        <option value="all">All</option>
+                        <option value="scanner">Scanner</option>
+                        <option value="laptop">Laptop</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="m_phone">Mobile Phone</option>
+                        <option value="pc_laptop">Laptop</option>
+                        <option value="tablet">Tablet</option>
+                    </select>&nbsp;
+                    <label for="country">Country:</label>
+                    <select id="country" name="country" optional>
+                        <option value="c_all">All</option>
+                        <option value="c_usa">USA</option>
+                        <option value="c_caneda">Canada</option>
+                        <option value="c_uk">UK</option>
+                    </select>&nbsp;
+                    <label for="department">Department:</label>
+                    <select id="department" name="department" optional>
+                        <option value="d_all">All</option>
+                        <option value="engineering">Engineering</option>
+                        <option value="manuf">Manufacturing</option>
+                        <option value="it">IT</option>
+                    </select>&nbsp;
+                    <button type="submit" class="btn2" onclick="/*RetrieveReport()*/">Generate Report</button>                    
+                </form>
+            </div>
+
+            <!--div for the report-->          
+            <div class="box-report" id="box-report-1">
+                <table id="report-table">
+                {% if response %}   
+                     <!-- Empty table to be populated with data -->
+                {% endif %}
+                </table>
+            </div>
+            <script>
+                // Call the fetchAndRenderTable function when the page loads
+                //window.onload = function() {
+                //    fetchAndRenderTable();
+                //};
+            </script>
+            
         </div>
-    </div>
+
 {% endblock %}
 
 {% block page_content_2 %}
@@ -63,3 +80,4 @@
         </ul>
     </div>
 {% endblock %}
+

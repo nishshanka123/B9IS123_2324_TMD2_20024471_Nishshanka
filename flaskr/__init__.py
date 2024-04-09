@@ -113,15 +113,91 @@ def create_app():
         if 'username' not in session:
             return redirect(url_for('login'))
         if request.method == 'POST':
-            catagory = request.form['device_catagory']
-            type = request.form['device_type']
-            country = request.form['country']
-            department = request.form['department']            
-            # write database queries and data retrival here
-            select_q = "SELECT * FROM xxxxxx"
+            return QueryReport()
+            #return "TEST----TEST----TEST"
+        elif request.method == 'GET':
+            return render_template('generate-reports.html')
         else:
-            data = None
-        return render_template('generate-reports.html')
+            return render_template('generate-reports.html')
+        #response_message = f"Data received: {records}"
+    
+
+    def QueryReport():
+        #catagory = request.form['device_catagory']
+        #type = request.form['device_type']
+        #country = request.form['country']
+        #department = request.form['department']
+
+        catagory = request.form.get('device_catagory')
+        type = request.form.get('device_type')
+        country = request.form.get('country')
+        department = request.form.get('department')
+
+        # write database queries and data retrival here
+        select_q = ""
+        where_c = "WHERE "
+        if catagory == 'mfactured':
+            # SerialNo | FirmwareVersion | ManufactureDate | ModelNumber
+            select_q = "SELECT * FROM CompanyManufacturedDevice"
+            if country != 'c_all' and department != 'd_all':
+                where_c = "WHERE Country = '" + country + "' AND Department = '" + department + "'"
+            else:
+                if country != 'c_all' and department == 'd_all':
+                    where_c = "WHERE Country = '" + country + "'"
+                elif country != 'c_all' and department == 'd_all':
+                    where_c = "WHERE Department = '" + department + "'"
+
+        elif catagory == '3rd_party':
+            select_q = "SELECT tp.SerialNo, tp.Manufacturer, tp.PurchasedDate, d.AssetNo, \
+                    d.device_name, d.device_condition, d.device_type, tp.Description \
+                    FROM ThirdpartyDevice as tp, Device as d"
+            where_c += "tp.AssetNo = d.AssetNo"
+            # implement the rest
+        else:
+            select_q = "SELECT cm.SerialNo, cm.FirmwareVersion, cm.ManufactureDate, \
+                        cm.ModelNumber, cm.ManufactureDate, d.assetNo, d.device_name, \
+                        d.device_condition, d.device_type FROM CompanyManufacturedDevice as cm, \
+                        Device as d "
+            where_c += "cm.AssetNo = d.AssetNo"
+            # implement the rest
+            
+            
+        select_q = select_q + where_c
+        records = QueryDataFromDb(select_q)
+        # store data in a JSON array and set to response
+        JsonData = []
+        for record_data in records:
+            FormattedRecord = {
+                'value1' : record_data[0] if len(record_data) > 0 else None,
+                'value2' : record_data[1] if len(record_data) > 1 else None,
+                'value3' : record_data[2] if len(record_data) > 2 else None,
+                'value4' : record_data[3] if len(record_data) > 3 else None,
+                'value5' : record_data[4] if len(record_data) > 4 else None,
+                'value6' : record_data[5] if len(record_data) > 5 else None,
+                'value7' : record_data[6] if len(record_data) > 6 else None,
+                'value8' : record_data[7] if len(record_data) > 7 else None,
+                'value9' : record_data[8] if len(record_data) > 8 else None
+            }
+            JsonData.append(FormattedRecord);
+        # prepare the response
+        response = {'JsonData':JsonData, 'count':len(JsonData)}
+        
+        # Return a JSON response
+        return jsonify(response)
+
+    def QueryDataFromDb(db_query):
+        records = None
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute(db_query)
+            records = cursor.fetchall()
+            cursor.close()
+        except Exception as ex:
+            records = ex;
+        return records;
+        #return "TESTTESTTESTTEST"
+
     
     @app.route('/settings')
     def settings():
@@ -151,8 +227,8 @@ def create_app():
             }
             Results.append(Result)
         response = {'Results': Results, 'count': len(Results)}
-        return jsonify(response)  # Use jsonify to convert response to JSON
-    
+        return jsonify(response)  # Use jsonify to convert response to JSON    
+
     def fetch_device_data():
         db = get_db()
         cursor = db.cursor()
