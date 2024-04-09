@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.forEach((value, key) => {
             data[key] = value;
         });
-        console.log(data['device_catagory']);
+        console.log(data);
         // Make a POST request to the server
         fetch('/generateReports', {
             method: 'POST',
@@ -30,11 +30,14 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(data);
 
             // Update the DOM with the response data (e.g., populate a table)
-            
+            const searchBox = document.getElementById('report-search'); // Get the search box
+            console.log("Search box: ", searchBox);
+            searchBox.innerHTML = '<span class="label search">Filter Report: </span> <input type="text" id="assetNo" onkeyup="searchByAssetNo()" class="search-data" placeholder="Search by Asset No.."></input>';
+            //searchBox.innerHTML = 'xxxxx';
             // Get the empty table element created for the report
             const table = document.getElementById('report-table'); // Get the table element
             // Clear existing table rows if any
-            console.log(table);
+            //console.log(table); // debug purpose
             table.innerHTML = '';
 
             // Create table header row
@@ -62,3 +65,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function searchByAssetNo() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("assetNo");
+    filter = input.value;
+    table = document.getElementById("report-table");
+    tr = table.getElementsByTagName("tr");
+  
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
