@@ -61,6 +61,34 @@ nav ul li a {
     border-radius: 5px;
 }
 
+.report-container {
+    display: flex;
+    flex-direction: column; /* Vertical layout */
+  }
+  
+.report-container .box {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+.report-container .box-search {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+  }
+  
+.report-container .box-report {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(225, 241, 242, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+
 .disabled a {
     color: #999;
     pointer-events: none;
