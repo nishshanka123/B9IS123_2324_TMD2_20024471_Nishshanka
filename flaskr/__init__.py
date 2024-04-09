@@ -101,6 +101,7 @@ def create_app():
     def generateReports():
         if request.method == 'POST':
             return QueryReport()
+            #return "TEST----TEST----TEST"
         elif request.method == 'GET':
             return render_template('generate-reports.html')
         else:
@@ -109,10 +110,16 @@ def create_app():
     
 
     def QueryReport():
-        catagory = request.form['device_catagory']
-        type = request.form['device_type']
-        country = request.form['country']
-        department = request.form['department']
+        #catagory = request.form['device_catagory']
+        #type = request.form['device_type']
+        #country = request.form['country']
+        #department = request.form['department']
+
+        catagory = request.form.get('device_catagory')
+        type = request.form.get('device_type')
+        country = request.form.get('country')
+        department = request.form.get('department')
+
         # write database queries and data retrival here
         select_q = ""
         where_c = "WHERE "
@@ -148,13 +155,15 @@ def create_app():
         JsonData = []
         for record_data in records:
             FormattedRecord = {
-                'value1' : record_data[0],
-                'value2' : record_data[1],
-                'value3' : record_data[2],
-                'value4' : record_data[3],
-                'value5' : record_data[4],
-                'value6' : record_data[5],
-                'value7' : record_data[6]
+                'value1' : record_data[0] if len(record_data) > 0 else None,
+                'value2' : record_data[1] if len(record_data) > 1 else None,
+                'value3' : record_data[2] if len(record_data) > 2 else None,
+                'value4' : record_data[3] if len(record_data) > 3 else None,
+                'value5' : record_data[4] if len(record_data) > 4 else None,
+                'value6' : record_data[5] if len(record_data) > 5 else None,
+                'value7' : record_data[6] if len(record_data) > 6 else None,
+                'value8' : record_data[7] if len(record_data) > 7 else None,
+                'value9' : record_data[8] if len(record_data) > 8 else None
             }
             JsonData.append(FormattedRecord);
         # prepare the response
@@ -174,6 +183,7 @@ def create_app():
         except Exception as ex:
             records = ex;
         return records;
+        #return "TESTTESTTESTTEST"
 
     
     @app.route('/settings')
