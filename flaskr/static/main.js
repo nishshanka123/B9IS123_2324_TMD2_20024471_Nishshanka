@@ -98,7 +98,7 @@
 
                 let deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => deleteDevice(x['AssertNo'], x['DeviceSerial']));
+                deleteButton.addEventListener('click', () => deleteConfirmation(x['AssertNo'], x['DeviceSerial']));
                 cell9.appendChild(editButton);
                 cell9.appendChild(deleteButton);
 
@@ -110,56 +110,56 @@
         });
   }
 
-  function SearchDevices() {
-    clearTable();
-    let table = document.getElementById("myTable");
-    let rows = table.getElementsByTagName('tr');
-    let search_value = document.getElementById("search_input").value.trim();
+  // function SearchDevices() {
+  //   clearTable();
+  //   let table = document.getElementById("myTable");
+  //   let rows = table.getElementsByTagName('tr');
+  //   let search_value = document.getElementById("search_input").value.trim();
 
-    if (search_value) {
-      console.log(search_value);
-        fetch(`/api/search/${search_value}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            data.Results.forEach(x => {
-                let newRow = rows[0].cloneNode(true);
-                let divs = newRow.getElementsByTagName('td');
-                divs[0].innerHTML = x['AssertNo'];
-                divs[1].innerHTML = x['DeviceName'];
-                divs[2].innerHTML = x['DeviceCondition'];
-                divs[3].innerHTML = x['DeviceType'];
-                divs[4].innerHTML = x['DeviceSerial'];
-                divs[5].innerHTML = x['DeviceFirmware'];
-                divs[6].innerHTML = x['ManufacturedDate'];
-                divs[7].innerHTML = x['ModelNumber'];
+  //   if (search_value) {
+  //     console.log(search_value);
+  //       fetch(`/api/search/${search_value}`)
+  //       .then(response => response.json())
+  //       .then(data => {
+  //           console.log(data);
+  //           data.Results.forEach(x => {
+  //               let newRow = rows[0].cloneNode(true);
+  //               let divs = newRow.getElementsByTagName('td');
+  //               divs[0].innerHTML = x['AssertNo'];
+  //               divs[1].innerHTML = x['DeviceName'];
+  //               divs[2].innerHTML = x['DeviceCondition'];
+  //               divs[3].innerHTML = x['DeviceType'];
+  //               divs[4].innerHTML = x['DeviceSerial'];
+  //               divs[5].innerHTML = x['DeviceFirmware'];
+  //               divs[6].innerHTML = x['ManufacturedDate'];
+  //               divs[7].innerHTML = x['ModelNumber'];
 
-                // Assign CSS classes to each column
-                // divs[0].classList.add('id-column');
-                // divs[1].classList.add('type-column');
-                // divs[2].classList.add('status-column');
+  //               // Assign CSS classes to each column
+  //               // divs[0].classList.add('id-column');
+  //               // divs[1].classList.add('type-column');
+  //               // divs[2].classList.add('status-column');
 
-                // Create and append edit and delete buttons to the row
-                let editButton = document.createElement('button');
-                editButton.textContent = 'Edit';
-                editButton.addEventListener('click', () => editDevice(x));
+  //               // Create and append edit and delete buttons to the row
+  //               let editButton = document.createElement('button');
+  //               editButton.textContent = 'Edit';
+  //               editButton.addEventListener('click', () => editDevice(x));
 
-                let deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => deleteDevice(x['AssertNo'], x['DeviceSerial']));
+  //               let deleteButton = document.createElement('button');
+  //               deleteButton.textContent = 'Delete';
+  //               deleteButton.addEventListener('click', () => deleteDevice(x['AssertNo'], x['DeviceSerial']));
 
-                let actionCell = document.createElement('td');
-                actionCell.classList.add('action-cell');
-                actionCell.appendChild(editButton);
-                actionCell.appendChild(deleteButton);
+  //               let actionCell = document.createElement('td');
+  //               actionCell.classList.add('action-cell');
+  //               actionCell.appendChild(editButton);
+  //               actionCell.appendChild(deleteButton);
 
-                newRow.appendChild(actionCell);
+  //               newRow.appendChild(actionCell);
 
-                table.appendChild(newRow);
-            });
-        });
-    }
-  }
+  //               table.appendChild(newRow);
+  //           });
+  //       });
+  //   }
+  // }
 
   function myFunctionSearch() {
     var input, filter, table, tr, td, i, txtValue;
@@ -180,6 +180,26 @@
     }
   }
 
+  function assertIdSearch() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("assert_no");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          showMessage("Assert number already exist !! . Please user another assert number.")
+          return true
+        } else {
+          return false
+        }
+      }       
+    }
+  }
+
 
   function editDevice(data) {
     changeFormContent('update_device',data)
@@ -191,7 +211,14 @@
 
   }
   
- 
+  function deleteConfirmation(assert_no, serial_no) {
+    var txt;
+    if (confirm("Are you sure you want to delete the device")) {
+      deleteDevice(assert_no, serial_no)
+    } else {
+      txt = "You pressed Cancel!";
+    }
+  }
   
   function deleteDevice(assert_no, serial_no) {
     console.log(assert_no);
@@ -292,26 +319,29 @@ document.addEventListener('DOMContentLoaded', function() {
   // Place your JavaScript code here
   document.getElementById('deviceForm').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent default form submission
-      var formData = new FormData(this); // Get form data
 
-      var api = document.getElementById('deviceForm').action
-      console.log('Nilusha Wimalasena')
-      console.log(api)
-      // Send form data to the API endpoint
-      fetch(api, {
-          method: 'POST',
-          body: formData
-      })
-      .then(response => response.json()) // Parse response JSON
-      .then(data => {
-          // Display message to the user
-          showMessage(data.message);
-          clearTable()
-          GetAllHomeDevices()
-      })
-      .catch(error => {
-          console.error('Error:', error);
-      });
+      if (!assertIdSearch()) {
+        var formData = new FormData(this); // Get form data
+
+        var api = document.getElementById('deviceForm').action
+        console.log(api)
+        // Send form data to the API endpoint
+        fetch(api, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json()) // Parse response JSON
+        .then(data => {
+            // Display message to the user
+            showMessage(data.message);
+            clearTable()
+            GetAllHomeDevices()
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+      }
+      
   });
 
   // Get the input element
