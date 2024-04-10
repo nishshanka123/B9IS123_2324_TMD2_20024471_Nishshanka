@@ -1,10 +1,10 @@
 
   function GetAllHomeDevices() {
     clearTable()
-    let table = document.getElementById("table1");
+    let table = document.getElementById("myTable");
     let rows = table.getElementsByTagName('tr');
 
-    fetch('/api/get_home_devices')
+    fetch('/api/get_devices')
         .then(response => response.json())
         .then(data => {
             console.log(data);
@@ -32,7 +32,7 @@
 
                 let deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => deleteDevice(x['AssertNo']));
+                deleteButton.addEventListener('click', () => deleteDevice(x['AssertNo'], x['DeviceSerial']));
 
                 let actionCell = document.createElement('td');
                 actionCell.classList.add('action-cell');
@@ -48,7 +48,7 @@
 
   function SearchDevices() {
     clearTable();
-    let table = document.getElementById("table1");
+    let table = document.getElementById("myTable");
     let rows = table.getElementsByTagName('tr');
     let search_value = document.getElementById("search_input").value.trim();
 
@@ -61,12 +61,14 @@
             data.Results.forEach(x => {
                 let newRow = rows[0].cloneNode(true);
                 let divs = newRow.getElementsByTagName('td');
-                divs[0].innerHTML = x['ID'];
-                divs[1].innerHTML = x['Name'];
-                divs[2].innerHTML = x['Condition'];
-                divs[3].innerHTML = x['Serial'];
-                divs[4].innerHTML = x['Date'];
-                divs[5].innerHTML = x['Type'];
+                divs[0].innerHTML = x['AssertNo'];
+                divs[1].innerHTML = x['DeviceName'];
+                divs[2].innerHTML = x['DeviceCondition'];
+                divs[3].innerHTML = x['DeviceType'];
+                divs[4].innerHTML = x['DeviceSerial'];
+                divs[5].innerHTML = x['DeviceFirmware'];
+                divs[6].innerHTML = x['ManufacturedDate'];
+                divs[7].innerHTML = x['ModelNumber'];
 
                 // Assign CSS classes to each column
                 // divs[0].classList.add('id-column');
@@ -80,7 +82,7 @@
 
                 let deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => deleteDevice(x['ID']));
+                deleteButton.addEventListener('click', () => deleteDevice(x['AssertNo'], x['DeviceSerial']));
 
                 let actionCell = document.createElement('td');
                 actionCell.classList.add('action-cell');
@@ -95,26 +97,41 @@
     }
   }
 
-
-  function addDevice() {
-
+  function myFunctionSearch() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }       
+    }
   }
+
 
   function editDevice(data) {
-    changeFormContent('edit',data)
+    changeFormContent('update_device',data)
 
   }
 
   function addDevice() {
-    changeFormContent('add')
+    changeFormContent('add_device')
 
   }
   
  
   
-  function deleteDevice(id) {
-    console.log(id);
-    fetch(`/api/delete_device/${id}`, {
+  function deleteDevice(assert_no, serial_no) {
+    console.log(assert_no);
+    fetch(`/api/delete_device/${assert_no}/${serial_no}`, {
       method: 'DELETE',
     })
     .then(response => {
@@ -136,7 +153,7 @@
 }
 
 function clearTable() {
-  let table = document.getElementById("table1");
+  let table = document.getElementById("myTable");
   // Remove all rows except the header row
   while (table.rows.length > 1) {
     table.deleteRow(1);
@@ -162,27 +179,33 @@ function changeFormContent(selection, data) {
     var submitButton = document.getElementById('submitButton');
     var deviceForm = document.getElementById('deviceForm');
 
-    if (selection === 'add') {
-        formTitle.textContent = 'Add New Device';
-        submitButton.textContent = 'Add Device';
-        deviceForm.action = '/api/add'; // Update form action
-        clearForm(); // Clear form fields
-    } else if (selection === 'edit') {
-        formTitle.textContent = 'Edit Device';
-        submitButton.textContent = 'Update Device';
-        deviceForm.action = '/api/update'; // Update form action
-        populateForm(data); // Populate form fields with data
+    if (selection == 'add_device') {
+      formTitle.textContent = 'Add New Device';
+      submitButton.textContent = 'Add Device';
+      deviceForm.action = '/api/add_device'; // Update form action
+
+      clearForm(); // Clear form fields
+    } else if (selection == 'update_device') {
+      formTitle.textContent = 'Edit Device Details';
+      submitButton.textContent = 'Update Device';
+      deviceForm.action = '/api/update_device'; // Update form action
+
+      populateForm(data); // Populate form fields with data
     }
 }
 
 // Function to populate form fields with data
 function populateForm(data) {
-    document.getElementById('device_id').value = data['ID'];
-    document.getElementById('device_name').value = data['Name'];
-    document.getElementById('device_condition').value = data['Condition'];
-    document.getElementById('device_serial').value = data['Serial'];
-    document.getElementById('device_MD').value = data['Date'];
-    document.getElementById('device_type').value = data['Type'];
+    document.getElementById('assert_no').value = data['AssertNo'];
+    // document.getElementById('assert_no').disabled = true;
+    document.getElementById('device_name').value = data['DeviceName'];
+    document.getElementById('device_condition').value = data['DeviceCondition'];
+    document.getElementById('device_type').value = data['DeviceType'];
+    document.getElementById('device_serial').value = data['DeviceSerial'];
+    // document.getElementById('device_serial').disabled = true;
+    document.getElementById('device_firmware').value = data['DeviceFirmware'];
+    document.getElementById('device_MD').value = data['ManufacturedDate'];
+    document.getElementById('model_no').value = data['ModelNumber'];
 }
 
 // Function to clear form fields
@@ -196,13 +219,17 @@ function clearForm() {
 
 // Function to handle form submission
 document.addEventListener('DOMContentLoaded', function() {
+
   GetAllHomeDevices();
+
   // Place your JavaScript code here
   document.getElementById('deviceForm').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent default form submission
       var formData = new FormData(this); // Get form data
 
       var api = document.getElementById('deviceForm').action
+      console.log('Nilusha Wimalasena')
+      console.log(api)
       // Send form data to the API endpoint
       fetch(api, {
           method: 'POST',
@@ -220,9 +247,31 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   });
 
-  // Function to display a message to the user
-  // function showMessage(message) {
-  //     // Display the message in a popup or alert box
-  //     alert(message);
-  // }
+  // Get the input element
+  const assertNo = document.getElementById('assert_no');
+  const serialNo = document.getElementById('device_serial');
+
+  // Add event listener for input event
+  assertNo.addEventListener('input', function(event) {
+      // Get the input value
+      let value = event.target.value;
+
+      // Remove any non-numeric characters using regular expression
+      value = value.replace(/\D/g, '');
+
+      // Update the input value
+      event.target.value = value;
+  });
+
+  // Add event listener for input event
+  serialNo.addEventListener('input', function(event) {
+    // Get the input value
+    let value = event.target.value;
+
+    // Remove any non-numeric characters using regular expression
+    value = value.replace(/\D/g, '');
+
+    // Update the input value
+    event.target.value = value;
+  });
 });

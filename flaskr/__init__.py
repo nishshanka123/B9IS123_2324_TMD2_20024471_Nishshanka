@@ -185,8 +185,8 @@ def create_app():
         session.clear()
         return render_template('login.html')
     
-    @app.route('/api/get_home_devices')
-    def get_home_devices():
+    @app.route('/api/get_devices')
+    def get_devices():
         device_data = fetch_home_device_data()
         Results = []
         for row in device_data:
@@ -202,15 +202,9 @@ def create_app():
             }
             Results.append(Result)
         response = {'Results': Results, 'count': len(Results)}
-<<<<<<< HEAD
         return jsonify(response)  # Use jsonify to convert response to JSON
     
     def fetch_home_device_data():
-=======
-        return jsonify(response)  # Use jsonify to convert response to JSON    
-
-    def fetch_device_data():
->>>>>>> B9IS123_2324_TMD2_PROGRAMMING_FOR_IS_GRP_CA2_dev
         db = get_db()
         cursor = db.cursor()
         cursor.execute("SELECT d.assetNo, d.device_name, d.device_condition, d.device_type, cm.SerialNo, cm.FirmwareVersion, cm.ManufactureDate, cm.ModelNumber FROM CompanyManufacturedDevice as cm, Device as d where cm.AssetNo = d.AssetNo")
@@ -219,44 +213,54 @@ def create_app():
 
         return data
     
-    @app.route("/api/add", methods=['GET', 'POST']) #Add Student
-    def add_student():
+    @app.route("/api/add_device", methods=['GET', 'POST']) #Add Student
+    def add_device():
         
         try: 
             if request.method == 'POST':
+                device_addert_no = request.form['assert_no']
                 device_name = request.form['device_name']
                 device_condition = request.form['device_condition']
-                device_serial = request.form['device_serial']
-                device_MD = request.form['device_MD']
                 device_type = request.form['device_type']
+                device_serial = request.form['device_serial']
+                device_firmware = request.form['device_firmware']
+                device_MD = request.form['device_MD']
+                device_model_no = request.form['model_no']
                 print(device_name,device_condition)
 
                 db = get_db()
                 cursor = db.cursor()
-                cursor.execute("INSERT INTO Device (device_name, device_condition, device_serial_no, device_manufactured_date, device_type) VALUES (%s, %s, %s, %s, %s)",(device_name, device_condition, device_serial, device_MD, device_type))
+                cursor.execute("INSERT INTO Device (assetNo, device_name, device_condition, device_type) VALUES (%s, %s, %s, %s)",(device_addert_no, device_name, device_condition, device_type))
+                cursor.execute("INSERT INTO CompanyManufacturedDevice (SerialNo, FirmwareVersion, ManufactureDate, ModelNumber, assetNo) VALUES (%s, %s, %s, %s, %s)",(device_serial, device_firmware, device_MD, device_model_no, device_addert_no))
                 cursor.close()
                 return jsonify({"message": "Add Device details successfully"}), 200
         except Exception as e:
             return jsonify({"error": "Failed to ad device", "details": str(e)}), 500
 
 
-    @app.route('/api/update', methods=['POST'])
+    @app.route('/api/update_device', methods=['POST'])
     def update_device():
         try:
             if request.method == 'POST':
-                device_id = request.form['device_id']
+                device_assert_no = request.form['assert_no']
                 device_name = request.form['device_name']
                 device_condition = request.form['device_condition']
-                device_serial = request.form['device_serial']
-                device_MD = request.form['device_MD']
                 device_type = request.form['device_type']
-                print(device_name,device_condition)
-                print(device_id)
-                logging.info(f"Received update request for device ID: {device_id}")
+                device_serial = request.form['device_serial']
+                device_firmware = request.form['device_firmware']
+                device_MD = request.form['device_MD']
+                device_model_no = request.form['model_no']
+                print(device_assert_no, device_name,device_condition, device_type)
+                # print(device_id)
+                #logging.info(f"Received update request for device ID: {device_id}")
 
                 db = get_db()
                 cursor = db.cursor()
-                cursor.execute("UPDATE Device SET device_name = %s, device_condition = %s, device_serial_no = %s, device_manufactured_date = %s, device_type = %s WHERE device_id = %s", (device_name, device_condition, device_serial, device_MD, device_type, device_id))
+                #UPDATE Device SET device_name = 'DS2250', device_condition = 'New', device_type = 'New' WHERE assetNo = '1';
+                #UPDATE CompanyManufacturedDevice SET FirmwareVersion = 'REV2', ManufactureDate = '2024-10-10', ModelNumber = 'DS1100' WHERE SerialNo = '11111111';
+                # 
+                cursor.execute("UPDATE Device SET device_name = %s, device_condition = %s, device_type = %s WHERE assetNo = %s", (device_name, device_condition, device_type, device_assert_no))
+                cursor.execute("UPDATE CompanyManufacturedDevice SET FirmwareVersion = %s, ManufactureDate = %s, ModelNumber = %s WHERE SerialNo = %s", (device_firmware, device_MD, device_model_no, device_serial))
                 db.commit()  # Commit transaction
 
                 cursor.close()
@@ -266,12 +270,13 @@ def create_app():
             logging.error(f"Failed to update device details: {str(e)}")
             return jsonify({"error": "Failed to update device details", "details": str(e)}), 500
     
-    @app.route('/api/delete_device/<int:device_id>', methods=['DELETE'])
-    def delete_device(device_id): 
+    @app.route('/api/delete_device/<string:assert_no>/<string:serial_no>', methods=['DELETE'])
+    def delete_device(assert_no, serial_no): 
         try:
             db = get_db()
             cursor = db.cursor()
-            cursor.execute("DELETE FROM Device WHERE device_id = %s", (device_id,))
+            cursor.execute("DELETE FROM CompanyManufacturedDevice WHERE SerialNo = %s", (serial_no,))
+            cursor.execute("DELETE FROM Device WHERE assetNo = %s", (assert_no,))
             cursor.close()  # Close the cursor after use
             return jsonify({"message": "Device deleted successfully"}), 200
         except Exception as e:
