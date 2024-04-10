@@ -277,9 +277,11 @@ function changeFormContent(selection, data) {
 
       clearForm(); // Clear form fields
     } else if (selection == 'update_device') {
+      var assert_no = data['AssertNo'];
+      var serial_no = data['DeviceSerial'];
       formTitle.textContent = 'Edit Device Details';
       submitButton.textContent = 'Update Device';
-      deviceForm.action = '/api/update_device'; // Update form action
+      deviceForm.action = `/api/update_device/${assert_no}/${serial_no}`; // Update form action
 
       populateForm(data); // Populate form fields with data
     }
@@ -288,12 +290,12 @@ function changeFormContent(selection, data) {
 // Function to populate form fields with data
 function populateForm(data) {
     document.getElementById('assert_no').value = data['AssertNo'];
-    // document.getElementById('assert_no').disabled = true;
+    document.getElementById('assert_no').disabled = true;
     document.getElementById('device_name').value = data['DeviceName'];
     document.getElementById('device_condition').value = data['DeviceCondition'];
     document.getElementById('device_type').value = data['DeviceType'];
     document.getElementById('device_serial').value = data['DeviceSerial'];
-    // document.getElementById('device_serial').disabled = true;
+    document.getElementById('device_serial').disabled = true;
     document.getElementById('device_firmware').value = data['DeviceFirmware'];
     document.getElementById('device_MD').value = data['ManufacturedDate'];
     document.getElementById('model_no').value = data['ModelNumber'];
@@ -309,6 +311,8 @@ function clearForm() {
     document.getElementById('device_firmware').value = '';
     document.getElementById('device_MD').value = '';
     document.getElementById('model_no').value = '';
+    document.getElementById('assert_no').disabled = false;
+    document.getElementById('device_serial').disabled = false;
 }
 
 // Function to handle form submission
@@ -320,27 +324,51 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('deviceForm').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent default form submission
 
-      if (!assertIdSearch()) {
         var formData = new FormData(this); // Get form data
 
         var api = document.getElementById('deviceForm').action
         console.log(api)
-        // Send form data to the API endpoint
-        fetch(api, {
+        let btnText = document.getElementById("submitButton").innerHTML;
+        console.log(btnText)
+
+        if (btnText == 'Add Device') {
+          if (!assertIdSearch()) {
+            console.log("Nilusha Niwanthaka - Add device")
+            // Send form data to the API endpoint
+            fetch(api, {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => response.json()) // Parse response JSON
+            .then(data => {
+                // Display message to the user
+                showMessage(data.message);
+                clearTable()
+                GetAllHomeDevices()
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+          }
+        } else {
+          console.log("Nilusha Niwanthaka - update device")
+          // Send form data to the API endpoint
+          fetch(api, {
             method: 'POST',
             body: formData
-        })
-        .then(response => response.json()) // Parse response JSON
-        .then(data => {
-            // Display message to the user
-            showMessage(data.message);
-            clearTable()
-            GetAllHomeDevices()
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-      }
+          })
+          .then(response => response.json()) // Parse response JSON
+          .then(data => {
+              // Display message to the user
+              showMessage(data.message);
+              clearTable()
+              GetAllHomeDevices()
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+        }
+
       
   });
 

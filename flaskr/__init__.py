@@ -280,19 +280,19 @@ def create_app():
             return jsonify({"error": "Failed to ad device", "details": str(e)}), 500
 
 
-    @app.route('/api/update_device', methods=['POST'])
-    def update_device():
+    @app.route('/api/update_device/<string:assert_no>/<string:serial_no>', methods=['POST'])
+    def update_device(assert_no, serial_no):
         try:
             if request.method == 'POST':
-                device_assert_no = request.form['assert_no']
+                #device_assert_no = request.form['assert_no']
                 device_name = request.form['device_name']
                 device_condition = request.form['device_condition']
                 device_type = request.form['device_type']
-                device_serial = request.form['device_serial']
+                #device_serial = request.form['device_serial']
                 device_firmware = request.form['device_firmware']
                 device_MD = request.form['device_MD']
                 device_model_no = request.form['model_no']
-                print(device_assert_no, device_name,device_condition, device_type)
+                #print(device_assert_no, device_name,device_condition, device_type)
                 # print(device_id)
                 #logging.info(f"Received update request for device ID: {device_id}")
 
@@ -301,8 +301,8 @@ def create_app():
                 #UPDATE Device SET device_name = 'DS2250', device_condition = 'New', device_type = 'New' WHERE assetNo = '1';
                 #UPDATE CompanyManufacturedDevice SET FirmwareVersion = 'REV2', ManufactureDate = '2024-10-10', ModelNumber = 'DS1100' WHERE SerialNo = '11111111';
                 # 
-                cursor.execute("UPDATE Device SET device_name = %s, device_condition = %s, device_type = %s WHERE assetNo = %s", (device_name, device_condition, device_type, device_assert_no))
-                cursor.execute("UPDATE CompanyManufacturedDevice SET FirmwareVersion = %s, ManufactureDate = %s, ModelNumber = %s WHERE SerialNo = %s", (device_firmware, device_MD, device_model_no, device_serial))
+                cursor.execute("UPDATE Device SET device_name = %s, device_condition = %s, device_type = %s WHERE assetNo = %s", (device_name, device_condition, device_type, assert_no))
+                cursor.execute("UPDATE CompanyManufacturedDevice SET FirmwareVersion = %s, ManufactureDate = %s, ModelNumber = %s WHERE SerialNo = %s", (device_firmware, device_MD, device_model_no, serial_no))
                 db.commit()  # Commit transaction
 
                 cursor.close()
