@@ -19,7 +19,7 @@ def create_app():
 
     app.config['MYSQL_HOST'] = 'localhost'
     app.config['MYSQL_USER'] = 'dbs'
-    app.config['MYSQL_PASSWORD'] = 'password'
+    app.config['MYSQL_PASSWORD'] = 'Venky1141@'
     app.config['MYSQL_DB'] = 'DIMS'
 
     # Initialize the database
@@ -113,6 +113,12 @@ def create_app():
     def generateReports():
         if 'username' not in session:
             return redirect(url_for('login'))
+        if request.method == 'GET':
+            device_catagory = fetch_device_catagory()
+            device_name = fetch_device_name()
+            countries = fetch_countries()
+            departments = fetch_departments()
+        return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, countries=countries, departments=departments)
         if request.method == 'POST':
             data = request.json
             #print("data------> ", data)
@@ -202,6 +208,38 @@ def create_app():
         else:
             return render_template('generate-reports.html')
         #response_message = f"Data received: {records}"
+
+    def fetch_device_catagory():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT DISTINCT device_type FROM Device")
+        device_catagory = [row[0] for row in cursor.fetchall()]
+        cursor.close()
+        return device_catagory
+
+    def fetch_device_name():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT DISTINCT device_name FROM Device")
+        device_name = [row[0] for row in cursor.fetchall()]
+        cursor.close()
+        return device_name
+
+    def fetch_countries():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT DISTINCT device_type FROM Device")
+        countries = [row[0] for row in cursor.fetchall()]
+        cursor.close()
+        return countries
+
+    def fetch_departments():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT DISTINCT device_type FROM Device")
+        departments = [row[0] for row in cursor.fetchall()]
+        cursor.close()
+        return departments
 
     def QueryDataFromDb(db_query):
         records = None
