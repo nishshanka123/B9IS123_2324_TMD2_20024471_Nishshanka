@@ -51,12 +51,21 @@ def create_app():
             return render_template('login.html')
 
     @app.route('/index')
-    def index():        
-        return render_template('index.html')
+    def index():
+        if 'username' not in session:
+            return redirect(url_for('login'))
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM Device")
+        data = cursor.fetchall()
+        cursor.close()
+        return render_template('index.html', data=data)
         #return data
     
     @app.route('/manage-devices')
     def manageDevices():
+        if 'username' not in session:
+            return redirect(url_for('login'))
         return render_template('manage-devices.html')
     
     def username_exists(username):
@@ -69,6 +78,8 @@ def create_app():
     
     @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
+        if 'username' not in session:
+            return redirect(url_for('login'))
         if request.method == 'POST':
             username = request.form['create_username']
             password = request.form['create_password']
@@ -99,6 +110,8 @@ def create_app():
     
     @app.route('/generateReports', methods=['GET', 'POST'])
     def generateReports():
+        if 'username' not in session:
+            return redirect(url_for('login'))
         if request.method == 'POST':
             return QueryReport()
             #return "TEST----TEST----TEST"
@@ -188,6 +201,8 @@ def create_app():
     
     @app.route('/settings')
     def settings():
+        if 'username' not in session:
+            return redirect(url_for('login'))
         return render_template('settings.html')
 
     @app.route('/logout')
@@ -197,6 +212,8 @@ def create_app():
     
     @app.route('/api/data')
     def get_data():
+        if 'username' not in session:
+            return redirect(url_for('login'))
         device_data = fetch_device_data()
         Results = []
         for row in device_data:
