@@ -98,6 +98,13 @@ nav ul li a {
     box-sizing: border-box;
     margin-bottom: 10px;
   }
+.search-data{
+    background-color: #f1f5f5;
+    color: black;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
   
 .report-container .box-report {
     background-color: #fff;
@@ -108,6 +115,13 @@ nav ul li a {
   }
   
 /* Table styles for report*/
+.report-search {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(225, 241, 242, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+}
+
 .box-report table {
     width: 100%;
     border-collapse: collapse;
