@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Inventory Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style-mainpage.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Device Inventory Management System</h1>
+    </header>
+    <div class="container">
+        <form class="login-form card" action="{{ url_for('login') }}" method="post">
+            <h2>Login Page</h2>
+            <label class="form-label">Username</label>
+            <input class="form-input" type="text" name="username" id="username" required>
+            <label class="form-label">Password</label>
+            <input class="form-input" type="password" name="password" id="password" required>
+            <input class="form-submit btn" type="submit" value="Login">
+            {% if msg %}
+            <p style="color: red;">{{ msg }}</p>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
