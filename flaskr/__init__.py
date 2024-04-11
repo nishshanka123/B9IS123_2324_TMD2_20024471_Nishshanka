@@ -19,7 +19,7 @@ def create_app():
 
     app.config['MYSQL_HOST'] = 'localhost'
     app.config['MYSQL_USER'] = 'dbs'
-    app.config['MYSQL_PASSWORD'] = 'Venky1141@'
+    app.config['MYSQL_PASSWORD'] = 'password'
     app.config['MYSQL_DB'] = 'DIMS'
 
     # Initialize the database
