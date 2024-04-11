@@ -31,12 +31,32 @@ nav ul li a {
     text-decoration: none;
 }
 .container {
-    width: 80%;
+    width: 95%;
     margin: 20px auto;
     overflow: hidden;
-    display:flex
+    display:flex;
 }
+.container1 {
+    width: 95%; 
+    margin: 20px auto;
+    overflow: hidden;
+    display:flex;
+}
+
+.subcard1 {
+    border: 2px solid rgba(41, 41, 42, 0.5);
+    padding: 12px 30px;
+    margin-right: 10px;
+}
+
+.subcard2 {
+    border: 2px solid rgba(41, 41, 42, 0.5);
+    padding: 12px 30px;
+    margin-left: 10px;
+}
+
 .card {
+    width: 100%;
     flex: true;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -52,10 +72,99 @@ nav ul li a {
     font-size: 16px;
     margin-bottom: 20px;
 }
+.card select {
+    background-color: #7e7878;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.report-container {
+    display: flex;
+    flex-direction: column; /* Vertical layout */
+  }
+  
+.report-container .box {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+.report-container .box-search {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+  }
+.search-data{
+    background-color: #f1f5f5;
+    color: black;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+  
+.report-container .box-report {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(225, 241, 242, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+/* Table styles for report*/
+.report-search {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(225, 241, 242, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.box-report table {
+    width: 100%;
+    border-collapse: collapse;
+}
+  
+.box-report  table th,
+  table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+  
+  /* Header row styles */
+.box-report  table th {
+    background-color: #f2f2f2;
+}
+  
+  /* Alternate row colors */
+.box-report table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+  
+  /* Hover effect on rows */
+.box-report table tr:hover {
+    background-color: #e6e6e6;
+}
+
+.disabled a {
+    color: #999;
+    pointer-events: none;
+}
+
 .btn {
     background-color: #333;
     color: white;
     padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+.btn2 {
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
     text-decoration: none;
     border-radius: 5px;
 }
@@ -118,3 +227,36 @@ nav ul li a {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     z-index: 9999;
 }
+
+#myInput {
+    /* background-image: url('/static/searchIcon.png'); */
+    /* background-position: 10px 10px;
+    background-repeat: no-repeat; */
+    width: 40%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
+    display: flex;
+  }
+  
+  #myTable {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #ddd;
+    font-size: 18px;
+  }
+  
+  #myTable th, #myTable td {
+    text-align: left;
+    padding: 12px;
+  }
+  
+  #myTable tr {
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #myTable tr.header, #myTable tr:hover {
+    background-color: #f1f1f1;
+  }
+  

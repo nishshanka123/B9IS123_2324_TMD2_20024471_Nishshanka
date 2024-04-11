@@ -9,39 +9,33 @@
     <title>Manage Devices</title>
     <!-- further custom styles if required -->
     <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='reports.js') }}"></script>
     <style>
         
     </style>
 </head>
 <body>
     <header>
-        <h1>Manage Devices</h1>
+        <h1>{% block header %}{% endblock %}</h1>
     </header>
     <nav>
         <ul>
             <li><a href="{{ url_for('index') }}">Home</a></li>
             <li><a href="{{ url_for('manageDevices') }}">Devices</a></li>
+            {% if session['DIMSRole'] == 'admin' %}
             <li><a href="{{ url_for('manageUsers') }}">Users</a></li>
+            {% else %}
+            <li class="disabled"><a href="#">Users</a></li>
+            {% endif %}
             <li><a href="{{ url_for('generateReports') }}">Reports</a></li>
             <li><a href="{{ url_for('settings') }}">Settings</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
     </nav>
     <div class="container">
-        <!-- replace following divs with flask implementation -->
-        <!-- @TODO: add if-else for page to handle the number of card containers -->
-        <div class="card">
-            {% block page_content_1 %}{% endblock %}
-        </div>
-        <div class="card">
-            {% block page_content_2 %}{% endblock %}
-        </div>
-        <!-- <div class="card">
-            {% block page_content_3 %}{% endblock %}
-        </div>
-        <div class="card">
-            {% block page_content_4 %}{% endblock %}
-        </div> -->
+        {% block page_content_1 %}{% endblock %}
+        
     </div>
+    <script src="{{ url_for('static', filename='reports.js') }}"></script>
 </body>
 </html>
