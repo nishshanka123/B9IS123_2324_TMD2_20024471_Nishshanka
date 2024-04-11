@@ -18,18 +18,16 @@
                         <label for="device_catagory">Device Catagory:</label>                
                         <select id="device_catagory" class="search-data" name="device_catagory" required>
                             <option value="all">All</option>
-                            <option value="3rd_party">Third Party</option>
-                            <option value="mfactured">Manufactured</option>                    
+                            {% for device_catagory in device_catagory %}
+                            <option value="{{ device_catagory }}">{{ device_catagory }}</option>
+                            {% endfor %}                     
                         </select>&nbsp;
                         <label for="device_type">Device Name:</label>
                         <select id="device_type" class="search-data" name="device_type" required>
                             <option value="all">All</option>
-                            <option value="scanner">Scanner</option>
-                            <option value="laptop">Laptop</option>
-                            <option value="tablet">Tablet</option>
-                            <option value="m_phone">Mobile Phone</option>
-                            <option value="pc_laptop">Laptop</option>
-                            <option value="tablet">Tablet</option>
+                            {% for device_name in device_name %}
+                            <option value="{{ device_name }}">{{ device_name }}</option>
+                            {% endfor %}
                         </select>&nbsp;
                         <label for="country">Country:</label>
                         <select id="country" class="search-data" name="country" optional>
