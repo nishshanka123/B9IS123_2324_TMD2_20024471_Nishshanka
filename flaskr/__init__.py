@@ -228,7 +228,7 @@ def create_app():
     def fetch_countries():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT DISTINCT device_type FROM Device")
+        cursor.execute("SELECT DISTINCT Name FROM Country")
         countries = [row[0] for row in cursor.fetchall()]
         cursor.close()
         return countries
