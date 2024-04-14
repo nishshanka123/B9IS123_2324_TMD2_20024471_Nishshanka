@@ -32,9 +32,9 @@
                         <label for="country">Country:</label>
                         <select id="country" class="search-data" name="country" optional>
                             <option value="c_all">All</option>
-                            <option value="c_usa">USA</option>
-                            <option value="c_caneda">Canada</option>
-                            <option value="c_uk">UK</option>
+                            {% for countries in countries %}
+                            <option value="{{ countries }}">{{ countries }}</option>
+                            {% endfor %}
                         </select>&nbsp;
                         <label for="department">Department:</label>
                         <select id="department" class="search-data" name="department" optional>

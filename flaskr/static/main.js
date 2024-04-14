@@ -167,16 +167,26 @@
     filter = input.value.toUpperCase();
     table = document.getElementById("myTable");
     tr = table.getElementsByTagName("tr");
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[0];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
+  
+    for (i = 1; i < tr.length; i++) { // Start from the second row (index 1) to skip the header row
+      var foundMatch = false;
+  
+      for (var j = 0; j < tr[i].cells.length; j++) { // Loop through each cell in the row
+        td = tr[i].cells[j];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            foundMatch = true;
+            break; // Exit the inner loop if a match is found
+          }
         }
-      }       
+      }
+  
+      if (foundMatch) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
     }
   }
 
@@ -298,9 +308,16 @@ function populateForm(data) {
     document.getElementById('device_serial').disabled = true;
     document.getElementById('device_firmware').value = data['DeviceFirmware'];
     document.getElementById('device_MD').value = data['ManufacturedDate'];
+    document.getElementById('device_MD').max = getCurrentDate(); // Set the max attribute to the current date
     document.getElementById('model_no').value = data['ModelNumber'];
 }
-
+function getCurrentDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 // Function to clear form fields
 function clearForm() {
     document.getElementById('assert_no').value = '';
@@ -324,7 +341,15 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('deviceForm').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent default form submission
 
-        var formData = new FormData(this); // Get form data
+      var formData = new FormData(this); // Get form data
+    var manufacturedDate = formData.get('device_MD');
+    var currentDate = new Date().toISOString().slice(0, 10); // Get the current date in YYYY-MM-DD format
+
+    if (manufacturedDate > currentDate) {
+      showMessage('Manufactured Date must be less than or equal to the current date.');
+      clearForm()
+      return;
+    }
 
         var api = document.getElementById('deviceForm').action
         console.log(api)
