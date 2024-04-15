@@ -34,11 +34,19 @@
             <!--a href="manage-devices.html" class="btn">Go to Devices</a-->
             <a href="{{ url_for('manageDevices') }}"  class="btn">Register</a>
         </div>
+    {% if session['DIMSRole'] == 'admin' %}
         <div class="card">
             <h2>Manage Users</h2>
             <p>Add, edit, or delete users who can access the system.</p>
             <a href="{{ url_for('manageUsers') }}" class="btn">Go to Users</a>
         </div>
+    {% else %}
+        <div class="card">
+            <h2>Manage Users</h2>
+            <p>Only administrators can access manage users.</p>
+            <a href="#" class="btn disabled" style="background-color: grey;">Go to Users</a>
+        </div>
+    {% endif %}
         <div class="card">
             <h2>Generate Reports</h2>
             <p>Generate reports on device usage, user activity, etc.</p>
