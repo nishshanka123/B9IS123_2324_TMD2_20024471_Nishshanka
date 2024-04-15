@@ -118,7 +118,7 @@ def create_app():
             device_name = fetch_device_name()
             countries = fetch_countries()
             departments = fetch_departments()
-        return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, countries=countries, departments=departments)
+            return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, countries=countries, departments=departments)
         if request.method == 'POST':
             data = request.json
             #print("data------> ", data)
