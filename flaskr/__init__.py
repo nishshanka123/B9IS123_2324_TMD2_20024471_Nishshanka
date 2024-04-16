@@ -141,7 +141,7 @@ def create_app():
             project_id = data['project']
             query_sp = "getAllDevices"
             args = (catagory, device_name, employee_id, project_id)
-            #print("Args:------------------------- ", args)
+
             records = ExecuteStoredProcedure(query_sp, args)
 
             JsonData = []
@@ -237,10 +237,10 @@ def create_app():
             cursor = db.cursor()
             cursor.execute(db_query)
             records = cursor.fetchall()
-            print("SELECT result-------------: ", records)
+            #print("SELECT result-------------: ", records)
             cursor.close()
         except Exception as ex:
-            print("Exception occurred: ", ex)
+            #print("Exception occurred: ", ex)
             records = ex;
         return records;
 
@@ -250,7 +250,7 @@ def create_app():
         try:
             db = get_db()
             cursor = db.cursor()
-            print("Calling SP...")
+            #print("Calling SP...")
             # call the stored procedure
             cursor.callproc(query_sp, args)
             # fetch the result
