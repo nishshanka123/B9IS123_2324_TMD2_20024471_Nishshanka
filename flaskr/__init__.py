@@ -124,39 +124,13 @@ def create_app():
             #print("data------> ", data)
 
             catagory = data['device_catagory']
-            type = data['device_type']
-            country = data['country']
-            department = data['department']
-            
-            select_q = ""
-            where_c = "WHERE "
-
-            if catagory == "mfactured":
-                select_q = "SELECT cm.SerialNo, cm.FirmwareVersion, cm.ModelNumber \
-                            , cm.ManufactureDate, d.assetNo, d.device_name, \
-                            d.device_condition, d.device_type FROM CompanyManufacturedDevice as cm, \
-                            Device as d "
-                where_c += "cm.AssetNo = d.AssetNo"
-
-            elif catagory == '3rd_party':
-                select_q = "SELECT tp.SerialNo, tp.OS, tp.Manufacturer, tp.PurchasedDate, d.AssetNo, \
-                    d.device_name, d.device_condition, d.device_type, tp.Description FROM \
-                        ThirdpartyDevice as tp, Device as d "
-                where_c += "tp.AssetNo = d.AssetNo"
-                # implement the rest
-            else:
-                select_q = "SELECT cm.SerialNo, cm.FirmwareVersion, cm.ModelNumber \
-                            , cm.ManufactureDate, d.assetNo, d.device_name, \
-                            d.device_condition, d.device_type FROM CompanyManufacturedDevice as cm, \
-                            Device as d "
-                where_c += "cm.AssetNo = d.AssetNo"
-                # implement the rest
-                
-            
-            select_q = select_q + where_c
-            #print("Select Q: ", select_q)
-            records = QueryDataFromDb(select_q)
-            # store data in a JSON array and set to response
+            device_name = data['device_name']
+            employee_id = data['employee']
+            project_id = data['project']
+            query_sp = "getAllDevices"
+            args = (catagory, device_name, employee_id, project_id)
+            #print("Args:------------------------- ", args)
+            records = ExecuteStoredProcedure(query_sp, args)
 
             JsonData = []
             for record_data in records:
@@ -177,7 +151,7 @@ def create_app():
             
             # Return a JSON response            
             return jsonify(response)
-
+            
             '''JsonData = []
             for record_data in records:
                 # Use OrderedDict to preserve insertion order
@@ -232,6 +206,9 @@ def create_app():
         countries = [row[0] for row in cursor.fetchall()]
         cursor.close()
         return countries
+    
+    def QueryEmployee():
+        pass
 
     def fetch_departments():
         db = get_db()
@@ -248,11 +225,36 @@ def create_app():
             cursor = db.cursor()
             cursor.execute(db_query)
             records = cursor.fetchall()
+            print("SELECT result-------------: ", records)
             cursor.close()
         except Exception as ex:
+            print("Exception occurred: ", ex)
             records = ex;
         return records;
 
+    def ExecuteStoredProcedure(query_sp, args):
+        records = []
+        #args = None
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            print("Calling SP...")
+            # call the stored procedure
+            cursor.callproc(query_sp, args)
+            # fetch the result
+            #records = cursor.stored_results()
+            for record in cursor.stored_results():
+                #print("record--------------: ", record)
+                #print("record data---------:", record.fetchall())
+                records.append(record.fetchall())
+            
+            #print("records 1: ", records[0])
+            cursor.close()
+        except Exception as ex:
+            print("Exception occurred: ", ex)
+            records = ex
+        # return the result set only
+        return records[0]
     
     @app.route('/settings')
     def settings():
