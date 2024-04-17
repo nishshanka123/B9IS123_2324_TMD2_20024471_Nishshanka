@@ -16,11 +16,11 @@
                 <div class="report-search" id="div-form">
                     <form id="report-form">
                         <label for="device_catagory">Device Catagory:</label>                
-                        <select id="device_catagory" class="search-data" name="device_catagory" required>
+                        <select id="device_catagory" class="search-data" name="device_catagory" required onchange="getDeviceTypesByCategory(this.value)">
                             <option value="all">All</option>
                             {% for device_catagory in device_catagory %}
                             <option value="{{ device_catagory }}">{{ device_catagory }}</option>
-                            {% endfor %}                     
+                            {% endfor %}
                         </select>&nbsp;
                         <label for="device_name">Device Name:</label>
                         <select id="device_name" class="search-data" name="device_name" required>
@@ -28,20 +28,22 @@
                             {% for device_name in device_name %}
                             <option value="{{ device_name }}">{{ device_name }}</option>
                             {% endfor %}
-                        </select>&nbsp;                        
+                        </select>&nbsp;
                         <label for="employee">Employee:</label>
                         <select id="employee" class="search-data" name="employee" optional>
-                            <option value="0">All</option>
-                            <option value="1">Employee 1</option>
-                            <option value="2">Employee 2</option>
-                            <option value="3">Employee 3</option>
+                            <option value="all">All</option>
+                            {% for employee in employee %}
+                            <option value="{{ employee.id }}">{{ employee.name }}</option>
+                            {% endfor %}
+                        </select>
                         </select>&nbsp;
                         <label for="project">Project:</label>
                         <select id="project" class="search-data" name="project" optional>
-                            <option value="0">All</option>
-                            <option value="1">Project 1</option>
-                            <option value="2">Project 2</option>
-                            <option value="3">Project 3</option>
+                            <option value="all">All</option>
+                            {% for project in projects %}
+                            <option value="{{ project.id }}">{{ project.name }}</option>
+                            {% endfor %}
+                        </select>
                         </select>&nbsp;
                         <button type="submit" class="btn2">Generate Report</button>                    
                     </form>
@@ -50,7 +52,7 @@
                 <div class="box-report" id="box-report-1">                    
                     <table id="report-table"></table>
                 </div>
-            </div>            
+            </div>                        
         </div>
 
 {% endblock %}
