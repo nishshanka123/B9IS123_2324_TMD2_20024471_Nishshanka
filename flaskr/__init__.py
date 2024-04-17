@@ -116,9 +116,9 @@ def create_app():
         if request.method == 'GET':
             device_catagory = fetch_device_catagory()
             device_name = fetch_device_name()
-            countries = fetch_countries()
-            departments = fetch_departments()
-            return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, countries=countries, departments=departments)
+            employee = fetch_employees()
+            projects = fetch_projects()
+            return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, employee=employee, projects=projects)
         if request.method == 'POST':
             data = request.json
             #print("data------> ", data)
@@ -209,6 +209,44 @@ def create_app():
             return render_template('generate-reports.html')
         #response_message = f"Data received: {records}"
 
+    @app.route('/api/get_device_types')
+    def get_device_types():
+        category = request.args.get('category')
+        db = get_db()
+        cursor = db.cursor()
+
+        if category == 'all':
+            cursor.execute("SELECT DISTINCT device_name, device_type FROM Device")
+        else:
+            cursor.execute("SELECT DISTINCT device_name, device_type FROM Device WHERE device_type = %s", (category,))
+
+        device_types = []
+        for row in cursor.fetchall():
+            if len(row) == 2:
+                device_types.append({'name': row[0], 'type': row[1]})
+            else:
+                # Handle the case where the row has an unexpected number of columns
+                print(f"Unexpected row format: {row}")
+
+        cursor.close()
+        return jsonify(device_types)
+    @app.route('/api/get_employees')
+    def get_employees():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT EmployeeID, Name FROM Employee")
+        employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+        cursor.close()
+        return jsonify(employees)
+    @app.route('/api/get_projects')
+    def get_projects():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT ProjectID, ProjectName FROM Project")
+        projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+        cursor.close()
+        return jsonify(projects)
+
     def fetch_device_catagory():
         db = get_db()
         cursor = db.cursor()
@@ -225,21 +263,21 @@ def create_app():
         cursor.close()
         return device_name
 
-    def fetch_countries():
+    def fetch_employees():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT DISTINCT Name FROM Country")
-        countries = [row[0] for row in cursor.fetchall()]
+        cursor.execute("SELECT EmployeeID, Name FROM Employee")
+        employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-        return countries
+        return employees
 
-    def fetch_departments():
+    def fetch_projects():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT DISTINCT device_type FROM Device")
-        departments = [row[0] for row in cursor.fetchall()]
+        cursor.execute("SELECT ProjectID, ProjectName FROM Project")
+        projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-        return departments
+        return projects
         
     def QueryDataFromDb(db_query):
         records = None
