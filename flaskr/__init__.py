@@ -254,14 +254,7 @@ def create_app():
         cursor.execute("SELECT EmployeeID, Name FROM Employee")
         employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-<<<<<<< HEAD
         return employees
-=======
-        return countries
-    
-    def QueryEmployee():
-        pass
->>>>>>> B9IS123_2324_TMD2_PROGRAMMING_FOR_IS_GRP_CA2_dev
 
     def fetch_projects():
         db = get_db()
