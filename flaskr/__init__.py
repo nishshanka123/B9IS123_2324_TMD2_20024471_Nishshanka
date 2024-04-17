@@ -8,6 +8,8 @@ import logging
 from .db import get_db
 from datetime import date
 from collections import OrderedDict
+from flask_bcrypt import Bcrypt
+from flask_bcrypt import check_password_hash
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -33,20 +35,25 @@ def create_app():
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute('SELECT username, DIMSRole FROM User WHERE username=%s AND password=%s', (username, password))
+            cursor.execute('SELECT username, password, DIMSRole FROM User WHERE username=%s', (username,))
             user = cursor.fetchone()
             cursor.close()
 
             if user:
-                session['username'] = user[0]
-                session['DIMSRole'] = user[1]
+                hashed_password = user[1]
+                if check_password_hash(hashed_password, password):
+                    session['username'] = user[0]
+                    session['DIMSRole'] = user[2]
 
-                if session['DIMSRole'] == 'admin':
-                    return redirect(url_for('index'))
+                    if session['DIMSRole'] == 'admin':
+                        return redirect(url_for('index'))
+                    else:
+                        return redirect(url_for('index'))
                 else:
-                    return redirect(url_for('index'))
+                    msg = 'Incorrect Password'
+                    return render_template('login.html', msg=msg)
             else:
-                msg = 'Incorrect Username or Password'
+                msg = 'Incorrect Username'
                 return render_template('login.html', msg=msg)
         else:
             return render_template('login.html')
@@ -76,6 +83,8 @@ def create_app():
         record = cursor.fetchone()
         cursor.close()
         return record is not None
+
+    bcrypt = Bcrypt(app)
     
     @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
@@ -93,10 +102,12 @@ def create_app():
                 error_msg = 'Password must be atleast 4 characters'
                 return render_template('manage-users.html', error_msg=error_msg)
 
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
             db = get_db()
             cursor = db.cursor()
             try:
-                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, password))
+                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, hashed_password))
                 db.commit()
                 msg = 'User registered successfully!'
                 return render_template('manage-users.html', msg=msg)
