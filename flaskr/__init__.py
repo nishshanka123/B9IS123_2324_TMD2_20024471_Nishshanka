@@ -8,6 +8,8 @@ import logging
 from .db import get_db
 from datetime import date
 from collections import OrderedDict
+from flask_bcrypt import Bcrypt
+from flask_bcrypt import check_password_hash
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -33,20 +35,25 @@ def create_app():
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute('SELECT username, DIMSRole FROM User WHERE username=%s AND password=%s', (username, password))
+            cursor.execute('SELECT username, password, DIMSRole FROM User WHERE username=%s', (username,))
             user = cursor.fetchone()
             cursor.close()
 
             if user:
-                session['username'] = user[0]
-                session['DIMSRole'] = user[1]
+                hashed_password = user[1]
+                if check_password_hash(hashed_password, password):
+                    session['username'] = user[0]
+                    session['DIMSRole'] = user[2]
 
-                if session['DIMSRole'] == 'admin':
-                    return redirect(url_for('index'))
+                    if session['DIMSRole'] == 'admin':
+                        return redirect(url_for('index'))
+                    else:
+                        return redirect(url_for('index'))
                 else:
-                    return redirect(url_for('index'))
+                    msg = 'Incorrect Password'
+                    return render_template('login.html', msg=msg)
             else:
-                msg = 'Incorrect Username or Password'
+                msg = 'Incorrect Username'
                 return render_template('login.html', msg=msg)
         else:
             return render_template('login.html')
@@ -76,6 +83,8 @@ def create_app():
         record = cursor.fetchone()
         cursor.close()
         return record is not None
+
+    bcrypt = Bcrypt(app)
     
     @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
@@ -93,10 +102,12 @@ def create_app():
                 error_msg = 'Password must be atleast 4 characters'
                 return render_template('manage-users.html', error_msg=error_msg)
 
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
             db = get_db()
             cursor = db.cursor()
             try:
-                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, password))
+                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, hashed_password))
                 db.commit()
                 msg = 'User registered successfully!'
                 return render_template('manage-users.html', msg=msg)
@@ -124,39 +135,13 @@ def create_app():
             #print("data------> ", data)
 
             catagory = data['device_catagory']
-            type = data['device_type']
-            country = data['country']
-            department = data['department']
-            
-            select_q = ""
-            where_c = "WHERE "
+            device_name = data['device_name']
+            employee_id = data['employee']
+            project_id = data['project']
+            query_sp = "getAllDevices"
+            args = (catagory, device_name, employee_id, project_id)
 
-            if catagory == "mfactured":
-                select_q = "SELECT cm.SerialNo, cm.FirmwareVersion, cm.ModelNumber \
-                            , cm.ManufactureDate, d.assetNo, d.device_name, \
-                            d.device_condition, d.device_type FROM CompanyManufacturedDevice as cm, \
-                            Device as d "
-                where_c += "cm.AssetNo = d.AssetNo"
-
-            elif catagory == '3rd_party':
-                select_q = "SELECT tp.SerialNo, tp.OS, tp.Manufacturer, tp.PurchasedDate, d.AssetNo, \
-                    d.device_name, d.device_condition, d.device_type, tp.Description FROM \
-                        ThirdpartyDevice as tp, Device as d "
-                where_c += "tp.AssetNo = d.AssetNo"
-                # implement the rest
-            else:
-                select_q = "SELECT cm.SerialNo, cm.FirmwareVersion, cm.ModelNumber \
-                            , cm.ManufactureDate, d.assetNo, d.device_name, \
-                            d.device_condition, d.device_type FROM CompanyManufacturedDevice as cm, \
-                            Device as d "
-                where_c += "cm.AssetNo = d.AssetNo"
-                # implement the rest
-                
-            
-            select_q = select_q + where_c
-            #print("Select Q: ", select_q)
-            records = QueryDataFromDb(select_q)
-            # store data in a JSON array and set to response
+            records = ExecuteStoredProcedure(query_sp, args)
 
             JsonData = []
             for record_data in records:
@@ -177,7 +162,7 @@ def create_app():
             
             # Return a JSON response            
             return jsonify(response)
-
+            
             '''JsonData = []
             for record_data in records:
                 # Use OrderedDict to preserve insertion order
@@ -286,11 +271,36 @@ def create_app():
             cursor = db.cursor()
             cursor.execute(db_query)
             records = cursor.fetchall()
+            #print("SELECT result-------------: ", records)
             cursor.close()
         except Exception as ex:
+            #print("Exception occurred: ", ex)
             records = ex;
         return records;
 
+    def ExecuteStoredProcedure(query_sp, args):
+        records = []
+        #args = None
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            #print("Calling SP...")
+            # call the stored procedure
+            cursor.callproc(query_sp, args)
+            # fetch the result
+            #records = cursor.stored_results()
+            for record in cursor.stored_results():
+                #print("record--------------: ", record)
+                #print("record data---------:", record.fetchall())
+                records.append(record.fetchall())
+            
+            #print("records 1: ", records[0])
+            cursor.close()
+        except Exception as ex:
+            print("Exception occurred: ", ex)
+            records = ex
+        # return the result set only
+        return records[0]
     
     @app.route('/settings')
     def settings():

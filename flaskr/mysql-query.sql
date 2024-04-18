@@ -262,6 +262,7 @@ select * from Project;
 select * from Employee;
 SELECT * FROM Device;
 
+
 Alter table Device drop column device_serial_no;
 
 
@@ -274,3 +275,26 @@ SELECT cm.SerialNo, cm.FirmwareVersion as Firmware_or_os, cm.ManufactureDate, cm
 
 CALL getAllDevices();
 
+SELECT cm.SerialNo, 
+      cm.FirmwareVersion, 
+      cm.ModelNumber, 
+      cm.ManufactureDate, 
+      d.assetNo, 
+      d.device_name,
+      d.device_condition,
+      d.device_type 
+      FROM CompanyManufacturedDevice as cm, Device as d
+      WHERE cm.AssetNo = d.AssetNo;
+      
+SELECT tp.SerialNo, 
+    tp.OS, 
+    tp.Manufacturer, 
+    tp.PurchasedDate, 
+    d.AssetNo,
+    d.device_name, 
+    d.device_condition, 
+    d.device_type, 
+    tp.Description 
+    FROM ThirdpartyDevice as tp, Device as d 
+    WHERE tp.AssetNo = d.AssetNo;
+    
