@@ -1,5 +1,9 @@
 
-  function GetAllHomeDevices() {
+let sortColumn = 0;
+let sortDirection = 'asc';
+let headers;
+
+function GetAllHomeDevices() {
     //clearTable()
     console.log("Inside get all")
     const table = document.getElementById('myTable');
@@ -44,7 +48,13 @@
 
     table.appendChild(tableHeaderRow)
 
+    // Get the table headers
+    headers = document.querySelectorAll('#myTable th');
 
+    // Add event listeners to the table headers
+    headers.forEach((header, index) => {
+        header.addEventListener('click', () => sortTable(index));
+    });
 
     // let table = document.getElementById("myTable");
     // let rows = table.getElementsByTagName('tr');
@@ -108,7 +118,42 @@
             });
             
         });
-  }
+}
+
+function sortTable(column) {
+    if (column === sortColumn) {
+        // Toggle the sort direction
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        // Update the sort column and direction
+        sortColumn = column;
+        sortDirection = 'asc';
+    }
+
+    // Get the table rows
+    const table = document.getElementById('myTable');
+    const rows = Array.from(table.getElementsByTagName('tr')).slice(1); // Skip the header row
+
+    // Sort the rows
+    rows.sort((a, b) => {
+        const aValue = a.getElementsByTagName('td')[column].textContent.toLowerCase();
+        const bValue = b.getElementsByTagName('td')[column].textContent.toLowerCase();
+
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    // Update the table rows
+    rows.forEach(row => table.appendChild(row));
+
+    // Update the sorting icons
+    headers.forEach((header, index) => {
+        header.querySelector('i').className = index === sortColumn
+            ? `fa fa-sort-${sortDirection}`
+            : 'fa fa-sort';
+    });
+}
 
   // function SearchDevices() {
   //   clearTable();
@@ -167,16 +212,26 @@
     filter = input.value.toUpperCase();
     table = document.getElementById("myTable");
     tr = table.getElementsByTagName("tr");
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[0];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
+  
+    for (i = 1; i < tr.length; i++) { // Start from the second row (index 1) to skip the header row
+      var foundMatch = false;
+  
+      for (var j = 0; j < tr[i].cells.length; j++) { // Loop through each cell in the row
+        td = tr[i].cells[j];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            foundMatch = true;
+            break; // Exit the inner loop if a match is found
+          }
         }
-      }       
+      }
+  
+      if (foundMatch) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
     }
   }
 
@@ -298,9 +353,16 @@ function populateForm(data) {
     document.getElementById('device_serial').disabled = true;
     document.getElementById('device_firmware').value = data['DeviceFirmware'];
     document.getElementById('device_MD').value = data['ManufacturedDate'];
+    document.getElementById('device_MD').max = getCurrentDate(); // Set the max attribute to the current date
     document.getElementById('model_no').value = data['ModelNumber'];
 }
-
+function getCurrentDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 // Function to clear form fields
 function clearForm() {
     document.getElementById('assert_no').value = '';
@@ -314,6 +376,32 @@ function clearForm() {
     document.getElementById('assert_no').disabled = false;
     document.getElementById('device_serial').disabled = false;
 }
+function getDeviceTypesByCategory(category) {
+  // Clear the existing options in the device_type dropdown
+  var deviceTypeDropdown = document.getElementById('device_type');
+  deviceTypeDropdown.options.length = 0;
+
+  // Add the 'All' option
+  var allOption = document.createElement('option');
+  allOption.value = 'all';
+  allOption.text = 'All';
+  deviceTypeDropdown.add(allOption);
+
+  // Make an request to the server-side to fetch device types based on the selected category
+  fetch(`/api/get_device_types?category=${category}`)
+      .then(response => response.json())
+      .then(data => {
+          data.forEach(device => {
+              var option = document.createElement('option');
+              option.value = device.name;
+              option.text = `${device.name} (${device.type})`;
+              deviceTypeDropdown.add(option);
+          });
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+}
 
 // Function to handle form submission
 document.addEventListener('DOMContentLoaded', function() {
@@ -324,7 +412,15 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('deviceForm').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent default form submission
 
-        var formData = new FormData(this); // Get form data
+      var formData = new FormData(this); // Get form data
+    var manufacturedDate = formData.get('device_MD');
+    var currentDate = new Date().toISOString().slice(0, 10); // Get the current date in YYYY-MM-DD format
+
+    if (manufacturedDate > currentDate) {
+      showMessage('Manufactured Date must be less than or equal to the current date.');
+      //clearForm()
+      return;
+    }
 
         var api = document.getElementById('deviceForm').action
         console.log(api)

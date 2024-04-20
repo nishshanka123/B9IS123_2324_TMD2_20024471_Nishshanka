@@ -8,6 +8,8 @@ import logging
 from .db import get_db
 from datetime import date
 from collections import OrderedDict
+from flask_bcrypt import Bcrypt
+from flask_bcrypt import check_password_hash
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -33,20 +35,25 @@ def create_app():
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute('SELECT username, DIMSRole FROM User WHERE username=%s AND password=%s', (username, password))
+            cursor.execute('SELECT username, password, DIMSRole FROM User WHERE username=%s', (username,))
             user = cursor.fetchone()
             cursor.close()
 
             if user:
-                session['username'] = user[0]
-                session['DIMSRole'] = user[1]
+                hashed_password = user[1]
+                if check_password_hash(hashed_password, password):
+                    session['username'] = user[0]
+                    session['DIMSRole'] = user[2]
 
-                if session['DIMSRole'] == 'admin':
-                    return redirect(url_for('index'))
+                    if session['DIMSRole'] == 'admin':
+                        return redirect(url_for('index'))
+                    else:
+                        return redirect(url_for('index'))
                 else:
-                    return redirect(url_for('index'))
+                    msg = 'Incorrect Password'
+                    return render_template('login.html', msg=msg)
             else:
-                msg = 'Incorrect Username or Password'
+                msg = 'Incorrect Username'
                 return render_template('login.html', msg=msg)
         else:
             return render_template('login.html')
@@ -76,6 +83,8 @@ def create_app():
         record = cursor.fetchone()
         cursor.close()
         return record is not None
+
+    bcrypt = Bcrypt(app)
     
     @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
@@ -93,10 +102,12 @@ def create_app():
                 error_msg = 'Password must be atleast 4 characters'
                 return render_template('manage-users.html', error_msg=error_msg)
 
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
             db = get_db()
             cursor = db.cursor()
             try:
-                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, password))
+                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, hashed_password))
                 db.commit()
                 msg = 'User registered successfully!'
                 return render_template('manage-users.html', msg=msg)
@@ -116,47 +127,24 @@ def create_app():
         if request.method == 'GET':
             device_catagory = fetch_device_catagory()
             device_name = fetch_device_name()
-            countries = fetch_countries()
-            departments = fetch_departments()
-        return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, countries=countries, departments=departments)
+            employee = fetch_employees()
+            projects = fetch_projects()
+            return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, employee=employee, projects=projects)
         if request.method == 'POST':
             data = request.json
             #print("data------> ", data)
 
             catagory = data['device_catagory']
-            type = data['device_type']
-            country = data['country']
-            department = data['department']
-            
-            select_q = ""
-            where_c = "WHERE "
+            device_name = data['device_name']
+            employee_id = data['employee']
+            project_id = data['project']
+            query_sp = "getAllDevices"
+            args = (catagory, device_name, employee_id, project_id)
 
-            if catagory == "mfactured":
-                select_q = "SELECT cm.SerialNo, cm.FirmwareVersion, cm.ModelNumber \
-                            , cm.ManufactureDate, d.assetNo, d.device_name, \
-                            d.device_condition, d.device_type FROM CompanyManufacturedDevice as cm, \
-                            Device as d "
-                where_c += "cm.AssetNo = d.AssetNo"
+            records, rowCount = ExecuteStoredProcedure(query_sp, args)
 
-            elif catagory == '3rd_party':
-                select_q = "SELECT tp.SerialNo, tp.OS, tp.Manufacturer, tp.PurchasedDate, d.AssetNo, \
-                    d.device_name, d.device_condition, d.device_type, tp.Description FROM \
-                        ThirdpartyDevice as tp, Device as d "
-                where_c += "tp.AssetNo = d.AssetNo"
-                # implement the rest
-            else:
-                select_q = "SELECT cm.SerialNo, cm.FirmwareVersion, cm.ModelNumber \
-                            , cm.ManufactureDate, d.assetNo, d.device_name, \
-                            d.device_condition, d.device_type FROM CompanyManufacturedDevice as cm, \
-                            Device as d "
-                where_c += "cm.AssetNo = d.AssetNo"
-                # implement the rest
-                
-            
-            select_q = select_q + where_c
-            #print("Select Q: ", select_q)
-            records = QueryDataFromDb(select_q)
-            # store data in a JSON array and set to response
+            if rowCount < 1:
+                print("generate-report: No record found")
 
             JsonData = []
             for record_data in records:
@@ -173,11 +161,12 @@ def create_app():
                 }
                 JsonData.append(FormattedRecord);
             # prepare the response
-            response = {'JsonData':JsonData, 'count':len(JsonData)}
+            #response = {'JsonData':JsonData, 'count':len(JsonData)}
+            response = {'JsonData':JsonData, 'count':rowCount}
             
             # Return a JSON response            
             return jsonify(response)
-
+            
             '''JsonData = []
             for record_data in records:
                 # Use OrderedDict to preserve insertion order
@@ -209,6 +198,44 @@ def create_app():
             return render_template('generate-reports.html')
         #response_message = f"Data received: {records}"
 
+    @app.route('/api/get_device_types')
+    def get_device_types():
+        category = request.args.get('category')
+        db = get_db()
+        cursor = db.cursor()
+
+        if category == 'all':
+            cursor.execute("SELECT DISTINCT device_name, device_type FROM Device")
+        else:
+            cursor.execute("SELECT DISTINCT device_name, device_type FROM Device WHERE device_type = %s", (category,))
+
+        device_types = []
+        for row in cursor.fetchall():
+            if len(row) == 2:
+                device_types.append({'name': row[0], 'type': row[1]})
+            else:
+                # Handle the case where the row has an unexpected number of columns
+                print(f"Unexpected row format: {row}")
+
+        cursor.close()
+        return jsonify(device_types)
+    @app.route('/api/get_employees')
+    def get_employees():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT EmployeeID, Name FROM Employee")
+        employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+        cursor.close()
+        return jsonify(employees)
+    @app.route('/api/get_projects')
+    def get_projects():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT ProjectID, ProjectName FROM Project")
+        projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+        cursor.close()
+        return jsonify(projects)
+
     def fetch_device_catagory():
         db = get_db()
         cursor = db.cursor()
@@ -225,21 +252,21 @@ def create_app():
         cursor.close()
         return device_name
 
-    def fetch_countries():
+    def fetch_employees():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT DISTINCT device_type FROM Device")
-        countries = [row[0] for row in cursor.fetchall()]
+        cursor.execute("SELECT EmployeeID, Name FROM Employee")
+        employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-        return countries
+        return employees
 
-    def fetch_departments():
+    def fetch_projects():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT DISTINCT device_type FROM Device")
-        departments = [row[0] for row in cursor.fetchall()]
+        cursor.execute("SELECT ProjectID, ProjectName FROM Project")
+        projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-        return departments
+        return projects
         
     def QueryDataFromDb(db_query):
         records = None
@@ -248,11 +275,40 @@ def create_app():
             cursor = db.cursor()
             cursor.execute(db_query)
             records = cursor.fetchall()
+            #print("SELECT result-------------: ", records)
             cursor.close()
         except Exception as ex:
+            #print("Exception occurred: ", ex)
             records = ex;
         return records;
 
+    def ExecuteStoredProcedure(query_sp, args):
+        records = []
+        rowCount = 0
+        #args = None
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            #print("Calling SP...")
+            # call the stored procedure
+            cursor.callproc(query_sp, args)
+            # fetch the result
+            #records = cursor.stored_results()
+            for record in cursor.stored_results():
+                #print("record--------------: ", record)
+                #print("record data---------:", record.fetchall())
+                records.append(record.fetchall())
+                #print("record row count: ", record.rowcount)
+                rowCount = record.rowcount;
+            
+            #print("records 1: ", records[0])
+            #print("record size: ", cursor.rowcount)
+            cursor.close()
+        except Exception as ex:
+            print("Exception occurred: ", ex)
+            records = ex
+        # return the result set only
+        return records[0], rowCount
     
     @app.route('/settings')
     def settings():
