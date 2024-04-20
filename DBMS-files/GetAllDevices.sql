@@ -49,5 +49,83 @@ BEGIN
 		FROM ThirdpartyDevice as tp, Device as d 
 		WHERE tp.AssetNo = d.AssetNo;
         
+	-- select * from device_info;
+    if dev_type = 'all' and dev_name = 'all'  then
+	  begin
+		if employee_id = 0 and project_id = 0 then
+			begin
+				-- select * from device_info;
+				select di.SerialNo, 
+					di.OSFW, 
+                    di.MorM, 
+                    di.PMDate, 
+                    di.AssetNo, 
+                    di.Name,
+                    di.Condition,
+                    di.device_type,
+                    di.Description, 
+                    ep.Name,
+                    pj.ProjectName
+				from device_info di
+                left Join Employee ep on di.EmployeeID = ep.EmployeeID
+                left Join Project pj on di.ProjectID = pj.ProjectID;
+			end;
+		elseif employee_id != 0 and project_id = 0 then
+			begin
+				select di.SerialNo, 
+					di.OSFW, 
+                    di.MorM, 
+                    di.PMDate, 
+                    di.AssetNo, 
+                    di.Name,
+                    di.Condition,
+                    di.device_type,
+                    di.Description, 
+                    ep.Name,
+                    pj.ProjectName
+				from device_info di
+                INNER Join Employee ep on di.EmployeeID = ep.EmployeeID
+                INNER Join Project pj on di.ProjectID = pj.ProjectID
+                where di.EmployeeID = employee_id;
+			end;
+		elseif employee_id = 0 and project_id != 0 then
+			begin
+				select di.SerialNo, 
+					di.OSFW, 
+                    di.MorM, 
+                    di.PMDate, 
+                    di.AssetNo, 
+                    di.Name,
+                    di.Condition,
+                    di.device_type,
+                    di.Description, 
+                    ep.Name,
+                    pj.ProjectName
+				from device_info di
+                INNER Join Employee ep on di.EmployeeID = ep.EmployeeID
+                INNER Join Project pj on di.ProjectID = pj.ProjectID
+                where di.ProjectID = project_id;
+			end;
+		elseif employee_id != 0 and project_id != 0 then
+			begin
+				select di.SerialNo, 
+					di.OSFW, 
+                    di.MorM, 
+                    di.PMDate, 
+                    di.AssetNo, 
+                    di.Name,
+                    di.Condition,
+                    di.device_type,
+                    di.Description, 
+                    ep.Name,
+                    pj.ProjectName
+				from device_info di
+                INNER Join Employee ep on di.EmployeeID = ep.EmployeeID
+                INNER Join Project pj on di.ProjectID = pj.ProjectID
+                where di.EmployeeID = employee_id and di.ProjectID = project_id;
+			end;
+		end if;
+	  end;
 	
+	end if;
 END
