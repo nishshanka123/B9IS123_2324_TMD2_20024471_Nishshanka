@@ -122,6 +122,16 @@ nav ul li a {
     padding: 20px;
 }
 
+.report-search p {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(225, 241, 242, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: left;
+    color: crimson;
+}
+
+
 .box-report table {
     width: 100%;
     border-collapse: collapse;
