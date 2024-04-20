@@ -28,10 +28,11 @@
                             {% for device_name in device_name %}
                             <option value="{{ device_name }}">{{ device_name }}</option>
                             {% endfor %}
-                        </select>&nbsp;
+                        </select>&nbsp;                        
+                        
                         <label for="employee">Employee:</label>
                         <select id="employee" class="search-data" name="employee" optional>
-                            <option value="all">All</option>
+                            <option value="0">All</option>
                             {% for employee in employee %}
                             <option value="{{ employee.id }}">{{ employee.name }}</option>
                             {% endfor %}
@@ -39,7 +40,7 @@
                         </select>&nbsp;
                         <label for="project">Project:</label>
                         <select id="project" class="search-data" name="project" optional>
-                            <option value="all">All</option>
+                            <option value="0">All</option>
                             {% for project in projects %}
                             <option value="{{ project.id }}">{{ project.name }}</option>
                             {% endfor %}
