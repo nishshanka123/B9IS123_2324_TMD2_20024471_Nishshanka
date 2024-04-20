@@ -360,6 +360,12 @@ def create_app():
                 device_model_no = request.form['model_no']
                 print(device_name,device_condition)
 
+                if device_addert_no is None:
+                    return jsonify({"message": "Assert number cannot be empty"}), 200
+                elif device_serial is None:
+                    return jsonify({"message": "Serial number cannot be empty"}), 200
+
+
                 db = get_db()
                 cursor = db.cursor()
                 cursor.execute("INSERT INTO Device (assetNo, device_name, device_condition, device_type) VALUES (%s, %s, %s, %s)",(device_addert_no, device_name, device_condition, device_type))
@@ -368,6 +374,9 @@ def create_app():
                 return jsonify({"message": "Add Device details successfully"}), 200
         except Exception as e:
             return jsonify({"error": "Failed to ad device", "details": str(e)}), 500
+        
+    def checkDeviceManufacturedDate(manufacturedDate):
+
 
     # Update device data in Device and CompanyManufacturedDevice tables.
     @app.route('/api/update_device/<string:assert_no>/<string:serial_no>', methods=['POST'])
@@ -446,7 +455,5 @@ def create_app():
 
     return app
 
-# if __name__ == "__main__":
-#     app.run(host='127.0.0.1', port='8080')
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port='8080') # indent this line
+    app.run(host='127.0.0.1', port='8080')
