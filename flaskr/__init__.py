@@ -8,6 +8,8 @@ import logging
 from .db import get_db
 from datetime import date
 from collections import OrderedDict
+from flask_bcrypt import Bcrypt
+from flask_bcrypt import check_password_hash
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -33,20 +35,25 @@ def create_app():
 
             db = get_db()
             cursor = db.cursor()
-            cursor.execute('SELECT username, DIMSRole FROM User WHERE username=%s AND password=%s', (username, password))
+            cursor.execute('SELECT username, password, DIMSRole FROM User WHERE username=%s', (username,))
             user = cursor.fetchone()
             cursor.close()
 
             if user:
-                session['username'] = user[0]
-                session['DIMSRole'] = user[1]
+                hashed_password = user[1]
+                if check_password_hash(hashed_password, password):
+                    session['username'] = user[0]
+                    session['DIMSRole'] = user[2]
 
-                if session['DIMSRole'] == 'admin':
-                    return redirect(url_for('index'))
+                    if session['DIMSRole'] == 'admin':
+                        return redirect(url_for('index'))
+                    else:
+                        return redirect(url_for('index'))
                 else:
-                    return redirect(url_for('index'))
+                    msg = 'Incorrect Password'
+                    return render_template('login.html', msg=msg)
             else:
-                msg = 'Incorrect Username or Password'
+                msg = 'Incorrect Username'
                 return render_template('login.html', msg=msg)
         else:
             return render_template('login.html')
@@ -76,6 +83,8 @@ def create_app():
         record = cursor.fetchone()
         cursor.close()
         return record is not None
+
+    bcrypt = Bcrypt(app)
     
     @app.route('/users', methods=['GET', 'POST'])
     def manageUsers():
@@ -93,10 +102,12 @@ def create_app():
                 error_msg = 'Password must be atleast 4 characters'
                 return render_template('manage-users.html', error_msg=error_msg)
 
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
             db = get_db()
             cursor = db.cursor()
             try:
-                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, password))
+                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, hashed_password))
                 db.commit()
                 msg = 'User registered successfully!'
                 return render_template('manage-users.html', msg=msg)
@@ -116,9 +127,9 @@ def create_app():
         if request.method == 'GET':
             device_catagory = fetch_device_catagory()
             device_name = fetch_device_name()
-            countries = fetch_countries()
-            departments = fetch_departments()
-            return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, countries=countries, departments=departments)
+            employee = fetch_employees()
+            projects = fetch_projects()
+            return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, employee=employee, projects=projects)
         if request.method == 'POST':
             data = request.json
             #print("data------> ", data)
@@ -183,6 +194,44 @@ def create_app():
             return render_template('generate-reports.html')
         #response_message = f"Data received: {records}"
 
+    @app.route('/api/get_device_types')
+    def get_device_types():
+        category = request.args.get('category')
+        db = get_db()
+        cursor = db.cursor()
+
+        if category == 'all':
+            cursor.execute("SELECT DISTINCT device_name, device_type FROM Device")
+        else:
+            cursor.execute("SELECT DISTINCT device_name, device_type FROM Device WHERE device_type = %s", (category,))
+
+        device_types = []
+        for row in cursor.fetchall():
+            if len(row) == 2:
+                device_types.append({'name': row[0], 'type': row[1]})
+            else:
+                # Handle the case where the row has an unexpected number of columns
+                print(f"Unexpected row format: {row}")
+
+        cursor.close()
+        return jsonify(device_types)
+    @app.route('/api/get_employees')
+    def get_employees():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT EmployeeID, Name FROM Employee")
+        employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+        cursor.close()
+        return jsonify(employees)
+    @app.route('/api/get_projects')
+    def get_projects():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT ProjectID, ProjectName FROM Project")
+        projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+        cursor.close()
+        return jsonify(projects)
+
     def fetch_device_catagory():
         db = get_db()
         cursor = db.cursor()
@@ -199,24 +248,21 @@ def create_app():
         cursor.close()
         return device_name
 
-    def fetch_countries():
+    def fetch_employees():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT DISTINCT Name FROM Country")
-        countries = [row[0] for row in cursor.fetchall()]
+        cursor.execute("SELECT EmployeeID, Name FROM Employee")
+        employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-        return countries
-    
-    def QueryEmployee():
-        pass
+        return employees
 
-    def fetch_departments():
+    def fetch_projects():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT DISTINCT device_type FROM Device")
-        departments = [row[0] for row in cursor.fetchall()]
+        cursor.execute("SELECT ProjectID, ProjectName FROM Project")
+        projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-        return departments
+        return projects
         
     def QueryDataFromDb(db_query):
         records = None
