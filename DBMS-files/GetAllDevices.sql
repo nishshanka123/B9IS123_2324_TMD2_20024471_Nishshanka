@@ -1,8 +1,8 @@
-CREATE DEFINER=`nishshanka`@`localhost` PROCEDURE `GetAllDevices`(
+CREATE DEFINER=`dbs`@`localhost` PROCEDURE `GetAllDevices`(
 in dev_type VARCHAR(20), 
 in dev_name VARCHAR(20), 
 in employee_id INT, 
-in department_id INT
+in project_id INT
 )
 BEGIN
 	DROP TABLE IF EXISTS device_info;
@@ -12,7 +12,7 @@ BEGIN
 			`MorM` VARCHAR(20),
 			`PMDate` DATE,
 			`AssetNo` VARCHAR(12),
-			`Named` VARCHAR(20),
+			`Name` VARCHAR(20),
 			`Condition` VARCHAR(20),
 			`device_type` VARCHAR(50),
 			`Description` VARCHAR(40),
@@ -34,7 +34,7 @@ BEGIN
 			cm.ProjectID
 		FROM CompanyManufacturedDevice as cm, 
 		Device as d where cm.AssetNo = d.AssetNo;
-		insert into device_info
+	insert into device_info
 		SELECT tp.SerialNo, 
 		tp.OS, 
 		tp.Manufacturer, 
@@ -49,5 +49,5 @@ BEGIN
 		FROM ThirdpartyDevice as tp, Device as d 
 		WHERE tp.AssetNo = d.AssetNo;
         
-	select * from device_info;
+	
 END
