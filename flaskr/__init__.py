@@ -93,6 +93,7 @@ def create_app():
         if request.method == 'POST':
             username = request.form['create_username']
             password = request.form['create_password']
+            role = request.form['user_role']
 
             if username_exists(username):
                 error_msg = 'Username already exists. Please use another Username.'
@@ -107,7 +108,7 @@ def create_app():
             db = get_db()
             cursor = db.cursor()
             try:
-                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, hashed_password))
+                cursor.execute('INSERT INTO User (username, password, DIMSRole) VALUES (%s, %s, %s)', (username, hashed_password, role))
                 db.commit()
                 msg = 'User registered successfully!'
                 return render_template('manage-users.html', msg=msg)
