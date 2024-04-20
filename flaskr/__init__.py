@@ -142,7 +142,10 @@ def create_app():
             query_sp = "getAllDevices"
             args = (catagory, device_name, employee_id, project_id)
 
-            records = ExecuteStoredProcedure(query_sp, args)
+            records, rowCount = ExecuteStoredProcedure(query_sp, args)
+
+            if rowCount < 1:
+                print("generate-report: No record found")
 
             JsonData = []
             for record_data in records:
@@ -159,7 +162,8 @@ def create_app():
                 }
                 JsonData.append(FormattedRecord);
             # prepare the response
-            response = {'JsonData':JsonData, 'count':len(JsonData)}
+            #response = {'JsonData':JsonData, 'count':len(JsonData)}
+            response = {'JsonData':JsonData, 'count':rowCount}
             
             # Return a JSON response            
             return jsonify(response)
@@ -281,6 +285,7 @@ def create_app():
 
     def ExecuteStoredProcedure(query_sp, args):
         records = []
+        rowCount = 0
         #args = None
         try:
             db = get_db()
@@ -294,14 +299,17 @@ def create_app():
                 #print("record--------------: ", record)
                 #print("record data---------:", record.fetchall())
                 records.append(record.fetchall())
+                #print("record row count: ", record.rowcount)
+                rowCount = record.rowcount;
             
             #print("records 1: ", records[0])
+            #print("record size: ", cursor.rowcount)
             cursor.close()
         except Exception as ex:
             print("Exception occurred: ", ex)
             records = ex
         # return the result set only
-        return records[0]
+        return records[0], rowCount
     
     @app.route('/settings')
     def settings():
