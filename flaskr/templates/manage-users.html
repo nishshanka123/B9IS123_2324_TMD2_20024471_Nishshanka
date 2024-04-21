@@ -8,13 +8,19 @@
 {% block page_content_1 %}
     <div class="sub-card1">
         <h2>Register New User</h2>
-        <form action="{{url_for('manageUsers')}}" method="post">
-            <label for="create_username">Create User Name:</label>
-            <input type="text" id="create_username" name="create_username" required><br><br>
-            <label for="create_password">Create Password:</label>
-            <input type="text" id="create_password" name="create_password" required><br><br>
-            <button type="submit" class="btn">Register</button>
-        </form>
+        <div class="container1">
+            <form action="{{url_for('manageUsers')}}" method="post">
+                <label for="create_username">Create User Name:</label>
+                <input type="text" id="create_username" name="create_username" required><br><br>
+                <label for="create_password">Create Password:</label>
+                <input type="text" id="create_password" name="create_password" required><br><br>
+                <select id="user_role" name="user_role" required>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select><br><br>
+                <button type="submit" class="btn">Register</button>
+            </form>
+        </div>
 
         {% if error_msg %}
             <p style="color: red;">{{ error_msg }}</p>

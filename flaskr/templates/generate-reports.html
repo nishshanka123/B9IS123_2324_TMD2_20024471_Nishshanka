@@ -16,7 +16,7 @@
                 <div class="report-search" id="div-form">
                     <form id="report-form">
                         <label for="device_catagory">Device Catagory:</label>                
-                        <select id="device_catagory" class="search-data" name="device_catagory" required onchange="getDeviceTypesByCategory(this.value)">
+                        <select id="device_catagory" class="search-data" name="device_catagory" required onchange="getDeviceNamesByCategory(this.value)">
                             <option value="all">All</option>
                             {% for device_catagory in device_catagory %}
                             <option value="{{ device_catagory }}">{{ device_catagory }}</option>
@@ -29,16 +29,10 @@
                             <option value="{{ device_name }}">{{ device_name }}</option>
                             {% endfor %}
                         </select>&nbsp;                        
+                        
                         <label for="employee">Employee:</label>
                         <select id="employee" class="search-data" name="employee" optional>
                             <option value="0">All</option>
-                            <option value="1">Employee 1</option>
-                            <option value="2">Employee 2</option>
-                            <option value="3">Employee 3</option>
-                        </select>&nbsp;
-                        <label for="employee">Employee:</label>
-                        <select id="employee" class="search-data" name="employee" optional>
-                            <option value="all">All</option>
                             {% for employee in employee %}
                             <option value="{{ employee.id }}">{{ employee.name }}</option>
                             {% endfor %}
@@ -46,7 +40,7 @@
                         </select>&nbsp;
                         <label for="project">Project:</label>
                         <select id="project" class="search-data" name="project" optional>
-                            <option value="all">All</option>
+                            <option value="0">All</option>
                             {% for project in projects %}
                             <option value="{{ project.id }}">{{ project.name }}</option>
                             {% endfor %}
