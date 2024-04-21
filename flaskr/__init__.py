@@ -39,6 +39,7 @@ def create_app():
             user = cursor.fetchone()
             cursor.close()
 
+            
             if user:
                 hashed_password = user[1]
                 if check_password_hash(hashed_password, password):
@@ -93,6 +94,7 @@ def create_app():
         if request.method == 'POST':
             username = request.form['create_username']
             password = request.form['create_password']
+            role = request.form['user_role']
 
             if username_exists(username):
                 error_msg = 'Username already exists. Please use another Username.'
@@ -107,7 +109,7 @@ def create_app():
             db = get_db()
             cursor = db.cursor()
             try:
-                cursor.execute('INSERT INTO User (username, password) VALUES (%s, %s)', (username, hashed_password))
+                cursor.execute('INSERT INTO User (username, password, DIMSRole) VALUES (%s, %s, %s)', (username, hashed_password, role))
                 db.commit()
                 msg = 'User registered successfully!'
                 return render_template('manage-users.html', msg=msg)
@@ -126,7 +128,7 @@ def create_app():
             return redirect(url_for('login'))
         if request.method == 'GET':
             device_catagory = fetch_device_catagory()
-            device_name = fetch_device_name()
+            device_name = fetch_device_name(device_catagory[0])  # Pass the first device category to fetch device names
             employee = fetch_employees()
             projects = fetch_projects()
             return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, employee=employee, projects=projects)
@@ -236,6 +238,11 @@ def create_app():
         projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
         return jsonify(projects)
+    @app.route('/api/get_device_names')
+    def get_device_names():
+        category = request.args.get('category')
+        device_names = fetch_device_name(category)
+        return jsonify(device_names)
 
     def fetch_device_catagory():
         db = get_db()
@@ -245,10 +252,13 @@ def create_app():
         cursor.close()
         return device_catagory
 
-    def fetch_device_name():
+    def fetch_device_name(device_type):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT DISTINCT device_name FROM Device")
+        if device_type == 'all':
+            cursor.execute("SELECT DISTINCT device_name FROM Device")
+        else:
+            cursor.execute("SELECT DISTINCT device_name FROM Device WHERE device_type = %s", (device_type,))
         device_name = [row[0] for row in cursor.fetchall()]
         cursor.close()
         return device_name
@@ -322,6 +332,7 @@ def create_app():
         session.clear()
         return render_template('login.html')
     
+    # Get company manufactured device list
     @app.route('/api/get_devices')
     def get_devices():
         device_data = fetch_home_device_data()
@@ -341,6 +352,7 @@ def create_app():
         response = {'Results': Results, 'count': len(Results)}
         return jsonify(response)  # Use jsonify to convert response to JSON
     
+    # Fetch all data from Device and CompanyManufacturedDevice tables.
     def fetch_home_device_data():
         db = get_db()
         cursor = db.cursor()
@@ -350,7 +362,8 @@ def create_app():
 
         return data
     
-    @app.route("/api/add_device", methods=['GET', 'POST']) #Add Student
+    # Add device to Device and CompanyManufacturedDevice tables.
+    @app.route("/api/add_device", methods=['GET', 'POST']) 
     def add_device():
         
         try: 
@@ -365,6 +378,12 @@ def create_app():
                 device_model_no = request.form['model_no']
                 print(device_name,device_condition)
 
+                if device_addert_no is None:
+                    return jsonify({"message": "Assert number cannot be empty"}), 200
+                elif device_serial is None:
+                    return jsonify({"message": "Serial number cannot be empty"}), 200
+
+
                 db = get_db()
                 cursor = db.cursor()
                 cursor.execute("INSERT INTO Device (assetNo, device_name, device_condition, device_type) VALUES (%s, %s, %s, %s)",(device_addert_no, device_name, device_condition, device_type))
@@ -373,32 +392,26 @@ def create_app():
                 return jsonify({"message": "Add Device details successfully"}), 200
         except Exception as e:
             return jsonify({"error": "Failed to ad device", "details": str(e)}), 500
+        
 
 
+    # Update device data in Device and CompanyManufacturedDevice tables.
     @app.route('/api/update_device/<string:assert_no>/<string:serial_no>', methods=['POST'])
     def update_device(assert_no, serial_no):
         try:
             if request.method == 'POST':
-                #device_assert_no = request.form['assert_no']
                 device_name = request.form['device_name']
                 device_condition = request.form['device_condition']
                 device_type = request.form['device_type']
-                #device_serial = request.form['device_serial']
                 device_firmware = request.form['device_firmware']
                 device_MD = request.form['device_MD']
                 device_model_no = request.form['model_no']
-                #print(device_assert_no, device_name,device_condition, device_type)
-                # print(device_id)
-                #logging.info(f"Received update request for device ID: {device_id}")
 
                 db = get_db()
                 cursor = db.cursor()
-                #UPDATE Device SET device_name = 'DS2250', device_condition = 'New', device_type = 'New' WHERE assetNo = '1';
-                #UPDATE CompanyManufacturedDevice SET FirmwareVersion = 'REV2', ManufactureDate = '2024-10-10', ModelNumber = 'DS1100' WHERE SerialNo = '11111111';
-                # 
                 cursor.execute("UPDATE Device SET device_name = %s, device_condition = %s, device_type = %s WHERE assetNo = %s", (device_name, device_condition, device_type, assert_no))
                 cursor.execute("UPDATE CompanyManufacturedDevice SET FirmwareVersion = %s, ManufactureDate = %s, ModelNumber = %s WHERE SerialNo = %s", (device_firmware, device_MD, device_model_no, serial_no))
-                db.commit()  # Commit transaction
+                db.commit() 
 
                 cursor.close()
 
@@ -407,6 +420,7 @@ def create_app():
             logging.error(f"Failed to update device details: {str(e)}")
             return jsonify({"error": "Failed to update device details", "details": str(e)}), 500
     
+    # FDelete device from Device and CompanyManufacturedDevice tables.
     @app.route('/api/delete_device/<string:assert_no>/<string:serial_no>', methods=['DELETE'])
     def delete_device(assert_no, serial_no): 
         try:
@@ -419,16 +433,15 @@ def create_app():
         except Exception as e:
             return jsonify({"error": "Failed to delete Device record", "details": str(e)}), 500
         
+    # Search device data from Device and CompanyManufacturedDevice tables.
     @app.route('/api/search/<string:search_value>')
     def search_device(search_value): 
         
         try:
             db = get_db()
             with db.cursor() as cursor:
-                # Parameterized query to avoid SQL injection
-                #cursor.execute("SELECT * FROM Device WHERE device_name = %s", (search_value,))
                 cursor.execute("SELECT * FROM Device WHERE device_name = %s OR device_condition = %s OR device_serial_no = %s OR device_type = %s", (search_value, search_value, search_value, search_value))
-                device_data = cursor.fetchall()  # Fetch the results before closing the cursor
+                device_data = cursor.fetchall() 
             
             Results = []
             print(device_data)
@@ -460,4 +473,7 @@ def create_app():
     return app
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port='8080')
+    app.run(host='0.0.0.0', port='8080')
+
+# if __name__ == "__main__":
+#  app.run(host='0.0.0.0', port='8080') # indent this line

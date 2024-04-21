@@ -16,7 +16,7 @@
                 <div class="report-search" id="div-form">
                     <form id="report-form">
                         <label for="device_catagory">Device Catagory:</label>                
-                        <select id="device_catagory" class="search-data" name="device_catagory" required onchange="getDeviceTypesByCategory(this.value)">
+                        <select id="device_catagory" class="search-data" name="device_catagory" required onchange="getDeviceNamesByCategory(this.value)">
                             <option value="all">All</option>
                             {% for device_catagory in device_catagory %}
                             <option value="{{ device_catagory }}">{{ device_catagory }}</option>

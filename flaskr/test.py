@@ -7,11 +7,11 @@ from mysql.connector import errorcode
 def get_db_connection():
   try:
     dims_db_con = mysql.connector.connect(
-      host = "127.0.0.1",
+      host = "localhost",
       user = "root",
-      password = "yash@1999",
+      password = "password",
       database = "DIMS",
-      port = "3306"
+      port = "8080"
     )
     dims_cursor = dims_db_con.cursor()
 
