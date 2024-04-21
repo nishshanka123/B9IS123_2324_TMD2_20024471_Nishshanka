@@ -132,11 +132,24 @@ def create_app():
             employee = fetch_employees()
             projects = fetch_projects()
             return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, employee=employee, projects=projects)
+            employee = fetch_employees()
+            projects = fetch_projects()
+            return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, employee=employee, projects=projects)
         if request.method == 'POST':
             data = request.json
             #print("data------> ", data)
 
             catagory = data['device_catagory']
+            device_name = data['device_name']
+            employee_id = data['employee']
+            project_id = data['project']
+            query_sp = "getAllDevices"
+            args = (catagory, device_name, employee_id, project_id)
+
+            records, rowCount = ExecuteStoredProcedure(query_sp, args)
+
+            if rowCount < 1:
+                print("generate-report: No record found")
             device_name = data['device_name']
             employee_id = data['employee']
             project_id = data['project']
@@ -155,19 +168,24 @@ def create_app():
                     "Asset No" : record_data[4] if len(record_data) > 4 else None,
                     "Firmware or OS" : record_data[1] if len(record_data) > 1 else None,
                     "Manufacturer or Model" : record_data[2] if len(record_data) > 2 else None,
-                    "Manufactured-purchased date" : record_data[3] if len(record_data) > 3 else None,
+                    "Manufactured-purchased date" : record_data[3].strftime('%Y-%m-%d') if len(record_data) > 3 else None,
                     "Name" : record_data[5] if len(record_data) > 5 else None,
                     "Condition" : record_data[6] if len(record_data) > 6 else None,
                     "Type" : record_data[7] if len(record_data) > 7 else None,
-                    "Description" : record_data[8] if len(record_data) > 8 else "NA"
+                    "Description" : record_data[8] if len(record_data) > 8 else "NA",
+                    "Owner" : record_data[9] if len(record_data) > 9 else "Unallocated",
+                    "Project" : record_data[10] if len(record_data) > 10 else "Not Assigned"
                 }
                 JsonData.append(FormattedRecord);
             # prepare the response
             #response = {'JsonData':JsonData, 'count':len(JsonData)}
             response = {'JsonData':JsonData, 'count':rowCount}
+            #response = {'JsonData':JsonData, 'count':len(JsonData)}
+            response = {'JsonData':JsonData, 'count':rowCount}
             
             # Return a JSON response            
             return jsonify(response)
+            
             
             '''JsonData = []
             for record_data in records:
@@ -255,19 +273,27 @@ def create_app():
         return device_name
 
     def fetch_employees():
+    def fetch_employees():
         db = get_db()
         cursor = db.cursor()
         cursor.execute("SELECT EmployeeID, Name FROM Employee")
         employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+        cursor.execute("SELECT EmployeeID, Name FROM Employee")
+        employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
         return employees
+        return employees
 
+    def fetch_projects():
     def fetch_projects():
         db = get_db()
         cursor = db.cursor()
         cursor.execute("SELECT ProjectID, ProjectName FROM Project")
         projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+        cursor.execute("SELECT ProjectID, ProjectName FROM Project")
+        projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
+        return projects
         return projects
         
     def QueryDataFromDb(db_query):
@@ -278,12 +304,41 @@ def create_app():
             cursor.execute(db_query)
             records = cursor.fetchall()
             #print("SELECT result-------------: ", records)
+            #print("SELECT result-------------: ", records)
             cursor.close()
         except Exception as ex:
+            #print("Exception occurred: ", ex)
             #print("Exception occurred: ", ex)
             records = ex;
         return records;
 
+    def ExecuteStoredProcedure(query_sp, args):
+        records = []
+        rowCount = 0
+        #args = None
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            #print("Calling SP...")
+            # call the stored procedure
+            cursor.callproc(query_sp, args)
+            # fetch the result
+            #records = cursor.stored_results()
+            for record in cursor.stored_results():
+                #print("record--------------: ", record)
+                #print("record data---------:", record.fetchall())
+                records.append(record.fetchall())
+                #print("record row count: ", record.rowcount)
+                rowCount = record.rowcount;
+            
+            #print("records 1: ", records[0])
+            #print("record size: ", cursor.rowcount)
+            cursor.close()
+        except Exception as ex:
+            print("Exception occurred: ", ex)
+            records = ex
+        # return the result set only
+        return records[0], rowCount
     def ExecuteStoredProcedure(query_sp, args):
         records = []
         rowCount = 0
