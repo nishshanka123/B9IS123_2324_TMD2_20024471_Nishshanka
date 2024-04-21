@@ -31,7 +31,7 @@ nav ul li a {
     text-decoration: none;
 }
 .container {
-    width: 95%;
+    width: 98%;
     margin: 20px auto;
     overflow: hidden;
     display:flex;
@@ -47,6 +47,14 @@ nav ul li a {
     border: 2px solid rgba(41, 41, 42, 0.5);
     padding: 12px 30px;
     margin-right: 10px;
+}
+
+.subcard1 input select{
+    background-color: #7e7878;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
 }
 
 .subcard2 {
@@ -83,6 +91,8 @@ nav ul li a {
 .report-container {
     display: flex;
     flex-direction: column; /* Vertical layout */
+    padding: 20px 10px;
+    width: 100%;
   }
   
 .report-container .box {
@@ -239,9 +249,7 @@ nav ul li a {
 }
 
 #myInput {
-    /* background-image: url('/static/searchIcon.png'); */
-    /* background-position: 10px 10px;
-    background-repeat: no-repeat; */
+    background-repeat: no-repeat; 
     width: 40%;
     font-size: 16px;
     padding: 12px 20px 12px 40px;
