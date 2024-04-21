@@ -49,6 +49,14 @@ nav ul li a {
     margin-right: 10px;
 }
 
+.subcard1 input select{
+    background-color: #7e7878;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
 .subcard2 {
     border: 2px solid rgba(41, 41, 42, 0.5);
     padding: 12px 30px;
@@ -83,6 +91,8 @@ nav ul li a {
 .report-container {
     display: flex;
     flex-direction: column; /* Vertical layout */
+    padding: 20px 10px;
+    width: 100%;
   }
   
 .report-container .box {
@@ -239,8 +249,6 @@ nav ul li a {
 }
 
 #myInput {
-    /* background-image: url('/static/searchIcon.png'); */
-    /* background-position: 10px 10px;
     background-repeat: no-repeat; */
     width: 40%;
     font-size: 16px;
