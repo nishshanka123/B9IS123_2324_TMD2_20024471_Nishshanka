@@ -354,8 +354,8 @@ def create_app():
                 'DeviceCondition': row[2],
                 'DeviceType': row[3],
                 'DeviceSerial': row[4],
-                'DeviceUser': row[5],
-                'DeviceFirmware': row[6],
+                'DeviceFirmware': row[5],
+                'DeviceUser': row[6],
                 'ManufacturedDate': row[7].strftime('%Y-%m-%d'),
                 'ModelNumber': row[8]
             }
@@ -416,13 +416,14 @@ def create_app():
                 device_condition = request.form['device_condition']
                 device_type = request.form['device_type']
                 device_firmware = request.form['device_firmware']
+                device_user = request.form['employee_name']
                 device_MD = request.form['device_MD']
                 device_model_no = request.form['model_no']
 
                 db = get_db()
                 cursor = db.cursor()
                 cursor.execute("UPDATE Device SET device_name = %s, device_condition = %s, device_type = %s WHERE assetNo = %s", (device_name, device_condition, device_type, assert_no))
-                cursor.execute("UPDATE CompanyManufacturedDevice SET FirmwareVersion = %s, ManufactureDate = %s, ModelNumber = %s WHERE SerialNo = %s", (device_firmware, device_MD, device_model_no, serial_no))
+                cursor.execute("UPDATE CompanyManufacturedDevice SET FirmwareVersion = %s, EmployeeID= %s, ManufactureDate = %s, ModelNumber = %s WHERE SerialNo = %s", (device_firmware, device_user, device_MD, device_model_no, serial_no))
                 db.commit() 
 
                 cursor.close()
