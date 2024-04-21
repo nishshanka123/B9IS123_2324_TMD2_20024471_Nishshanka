@@ -61,8 +61,6 @@ function GetAllHomeDevices() {
         header.addEventListener('click', () => sortTable(index));
     });
 
-    // let table = document.getElementById("myTable");
-    // let rows = table.getElementsByTagName('tr');
     const tableBody = document.getElementById("tableBody");
 
     fetch('/api/get_devices')
@@ -129,6 +127,7 @@ function GetAllHomeDevices() {
         });
 }
 
+//Dynamicaly populate employee names
 function addEmployeeDetails() {
   employee_select = document.getElementById('employee_name');
   employee_select.options.length = 0;
@@ -234,12 +233,13 @@ function sortTable(column) {
     }
   }
 
-
+  //Edit device from system
   function editDevice(data) {
     changeFormContent('update_device',data)
 
   }
 
+    //Add device to system
   function addDevice() {
     changeFormContent('add_device')
 
