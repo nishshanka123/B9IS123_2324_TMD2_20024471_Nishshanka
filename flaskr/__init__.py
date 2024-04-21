@@ -10,6 +10,7 @@ from datetime import date
 from collections import OrderedDict
 from flask_bcrypt import Bcrypt
 from flask_bcrypt import check_password_hash
+from flask import Flask, after_this_request
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -321,6 +322,13 @@ def create_app():
     def logout():
         session.clear()
         return render_template('login.html')
+
+    @app.after_request
+    def add_no_cache_headers(response):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
     
     @app.route('/api/get_devices')
     def get_devices():
