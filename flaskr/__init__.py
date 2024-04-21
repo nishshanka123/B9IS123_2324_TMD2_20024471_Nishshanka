@@ -42,20 +42,20 @@ def create_app():
             
             if user:
                 hashed_password = user[1]
-                # if check_password_hash(hashed_password, password):
-                session['username'] = user[0]
-                session['DIMSRole'] = user[2]
+                if check_password_hash(hashed_password, password):
+                    session['username'] = user[0]
+                    session['DIMSRole'] = user[2]
 
-                if session['DIMSRole'] == 'admin':
-                    return redirect(url_for('index'))
+                    if session['DIMSRole'] == 'admin':
+                        return redirect(url_for('index'))
+                    else:
+                        return redirect(url_for('index'))
                 else:
-                    return redirect(url_for('index'))
-                # else:
-                #     msg = 'Incorrect Password'
-                #     return render_template('login.html', msg=msg)
-            # else:
-            #     msg = 'Incorrect Username'
-            #     return render_template('login.html', msg=msg)
+                    msg = 'Incorrect Password'
+                    return render_template('login.html', msg=msg)
+            else:
+                msg = 'Incorrect Username'
+                return render_template('login.html', msg=msg)
         else:
             return render_template('login.html')
 
@@ -345,7 +345,7 @@ def create_app():
         return data
     
     # Add device to Device and CompanyManufacturedDevice tables.
-    @app.route("/api/add_device", methods=['GET', 'POST']) #Add Student
+    @app.route("/api/add_device", methods=['GET', 'POST']) 
     def add_device():
         
         try: 
@@ -375,7 +375,6 @@ def create_app():
         except Exception as e:
             return jsonify({"error": "Failed to ad device", "details": str(e)}), 500
         
-    def checkDeviceManufacturedDate(manufacturedDate):
 
 
     # Update device data in Device and CompanyManufacturedDevice tables.
@@ -456,4 +455,7 @@ def create_app():
     return app
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port='8080')
+    app.run(host='0.0.0.0', port='8080')
+
+# if __name__ == "__main__":
+#  app.run(host='0.0.0.0', port='8080') # indent this line
