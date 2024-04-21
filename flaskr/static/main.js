@@ -120,6 +120,12 @@ function GetAllHomeDevices() {
         });
 }
 
+function addEmployeeDetails() {
+  select = document.getElementById('employee_name');
+
+  
+}
+
 function sortTable(column) {
     if (column === sortColumn) {
         // Toggle the sort direction
