@@ -10,6 +10,7 @@ from datetime import date
 from collections import OrderedDict
 from flask_bcrypt import Bcrypt
 from flask_bcrypt import check_password_hash
+from flask import Flask, after_this_request
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -230,6 +231,7 @@ def create_app():
         employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
         return jsonify(employees)
+    
     @app.route('/api/get_projects')
     def get_projects():
         db = get_db()
@@ -238,6 +240,7 @@ def create_app():
         projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
         return jsonify(projects)
+    
     @app.route('/api/get_device_names')
     def get_device_names():
         category = request.args.get('category')
@@ -331,6 +334,13 @@ def create_app():
     def logout():
         session.clear()
         return render_template('login.html')
+
+    @app.after_request
+    def add_no_cache_headers(response):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
     
     # Get company manufactured device list
     @app.route('/api/get_devices')
@@ -344,9 +354,10 @@ def create_app():
                 'DeviceCondition': row[2],
                 'DeviceType': row[3],
                 'DeviceSerial': row[4],
-                'DeviceFirmware': row[5],
-                'ManufacturedDate': row[6].strftime('%Y-%m-%d'),
-                'ModelNumber': row[7]
+                'DeviceUser': row[5],
+                'DeviceFirmware': row[6],
+                'ManufacturedDate': row[7].strftime('%Y-%m-%d'),
+                'ModelNumber': row[8]
             }
             Results.append(Result)
         response = {'Results': Results, 'count': len(Results)}
@@ -356,7 +367,7 @@ def create_app():
     def fetch_home_device_data():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT d.assetNo, d.device_name, d.device_condition, d.device_type, cm.SerialNo, cm.FirmwareVersion, cm.ManufactureDate, cm.ModelNumber FROM CompanyManufacturedDevice as cm, Device as d where cm.AssetNo = d.AssetNo")
+        cursor.execute("SELECT d.assetNo, d.device_name, d.device_condition, d.device_type, cm.SerialNo, cm.FirmwareVersion, em.Name, cm.ManufactureDate, cm.ModelNumber FROM CompanyManufacturedDevice as cm, Employee as em, Device as d where cm.AssetNo = d.AssetNo AND em.EmployeeID = cm.EmployeeID")
         data = cursor.fetchall()
         cursor.close()
 
@@ -374,6 +385,7 @@ def create_app():
                 device_type = request.form['device_type']
                 device_serial = request.form['device_serial']
                 device_firmware = request.form['device_firmware']
+                device_user = request.form['employee_name']
                 device_MD = request.form['device_MD']
                 device_model_no = request.form['model_no']
                 print(device_name,device_condition)
@@ -387,7 +399,7 @@ def create_app():
                 db = get_db()
                 cursor = db.cursor()
                 cursor.execute("INSERT INTO Device (assetNo, device_name, device_condition, device_type) VALUES (%s, %s, %s, %s)",(device_addert_no, device_name, device_condition, device_type))
-                cursor.execute("INSERT INTO CompanyManufacturedDevice (SerialNo, FirmwareVersion, ManufactureDate, ModelNumber, assetNo) VALUES (%s, %s, %s, %s, %s)",(device_serial, device_firmware, device_MD, device_model_no, device_addert_no))
+                cursor.execute("INSERT INTO CompanyManufacturedDevice (SerialNo, FirmwareVersion, EmployeeID, ManufactureDate, ModelNumber, assetNo) VALUES (%s, %s, %s, %s, %s, %s)",(device_serial, device_firmware, device_user, device_MD, device_model_no, device_addert_no))
                 cursor.close()
                 return jsonify({"message": "Add Device details successfully"}), 200
         except Exception as e:
@@ -465,6 +477,29 @@ def create_app():
         except Exception as e:
             return jsonify({"error": "Failed to search for devices", "details": str(e)}), 500
 
+    # Get current employee details.
+    @app.route('/api/getEmployeeDetails')
+    def get_employee(): 
+        
+        try:
+            db = get_db()
+            with db.cursor() as cursor:
+                cursor.execute("SELECT  EmployeeID, Name FROM Employee")
+                employee_data = cursor.fetchall() 
+
+            print(employee_data)
+            Results = []
+            for row in employee_data:    
+                Result = {
+                    'ID': row[0],
+                    'Name': row[1]
+                }
+                Results.append(Result)
+            response = {'Results': Results, 'count': len(Results)}
+            return jsonify(response) 
+        
+        except Exception as e:
+            return jsonify({"error": "Failed to get employee details", "details": str(e)}), 500
 
     @app.teardown_appcontext
     def close_db(error):

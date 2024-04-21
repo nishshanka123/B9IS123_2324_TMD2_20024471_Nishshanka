@@ -31,13 +31,13 @@ nav ul li a {
     text-decoration: none;
 }
 .container {
-    width: 95%;
+    width: 98%;
     margin: 20px auto;
     overflow: hidden;
     display:flex;
 }
 .container1 {
-    width: 95%; 
+    width: 98%; 
     margin: 20px auto;
     overflow: hidden;
     display:flex;
