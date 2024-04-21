@@ -10,7 +10,6 @@ from datetime import date
 from collections import OrderedDict
 from flask_bcrypt import Bcrypt
 from flask_bcrypt import check_password_hash
-from flask import Flask, after_this_request
 
 def generate_secret_key(length=32):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*()-=_+'
@@ -133,24 +132,11 @@ def create_app():
             employee = fetch_employees()
             projects = fetch_projects()
             return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, employee=employee, projects=projects)
-            employee = fetch_employees()
-            projects = fetch_projects()
-            return render_template('generate-reports.html', device_catagory=device_catagory, device_name=device_name, employee=employee, projects=projects)
         if request.method == 'POST':
             data = request.json
             #print("data------> ", data)
 
             catagory = data['device_catagory']
-            device_name = data['device_name']
-            employee_id = data['employee']
-            project_id = data['project']
-            query_sp = "getAllDevices"
-            args = (catagory, device_name, employee_id, project_id)
-
-            records, rowCount = ExecuteStoredProcedure(query_sp, args)
-
-            if rowCount < 1:
-                print("generate-report: No record found")
             device_name = data['device_name']
             employee_id = data['employee']
             project_id = data['project']
@@ -181,12 +167,9 @@ def create_app():
             # prepare the response
             #response = {'JsonData':JsonData, 'count':len(JsonData)}
             response = {'JsonData':JsonData, 'count':rowCount}
-            #response = {'JsonData':JsonData, 'count':len(JsonData)}
-            response = {'JsonData':JsonData, 'count':rowCount}
             
             # Return a JSON response            
             return jsonify(response)
-            
             
             '''JsonData = []
             for record_data in records:
@@ -221,10 +204,9 @@ def create_app():
 
     @app.route('/api/get_device_types')
     def get_device_types():
-        category = request.args.get('category')
+        category = request.args.get('device_catagory')
         db = get_db()
         cursor = db.cursor()
-
         if category == 'all':
             cursor.execute("SELECT DISTINCT device_name, device_type FROM Device")
         else:
@@ -286,10 +268,7 @@ def create_app():
         cursor = db.cursor()
         cursor.execute("SELECT EmployeeID, Name FROM Employee")
         employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
-        cursor.execute("SELECT EmployeeID, Name FROM Employee")
-        employees = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-        return employees
         return employees
 
     def fetch_projects():
@@ -297,10 +276,7 @@ def create_app():
         cursor = db.cursor()
         cursor.execute("SELECT ProjectID, ProjectName FROM Project")
         projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
-        cursor.execute("SELECT ProjectID, ProjectName FROM Project")
-        projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
         cursor.close()
-        return projects
         return projects
         
     def QueryDataFromDb(db_query):
@@ -311,41 +287,12 @@ def create_app():
             cursor.execute(db_query)
             records = cursor.fetchall()
             #print("SELECT result-------------: ", records)
-            #print("SELECT result-------------: ", records)
             cursor.close()
         except Exception as ex:
-            #print("Exception occurred: ", ex)
             #print("Exception occurred: ", ex)
             records = ex;
         return records;
 
-    def ExecuteStoredProcedure(query_sp, args):
-        records = []
-        rowCount = 0
-        #args = None
-        try:
-            db = get_db()
-            cursor = db.cursor()
-            #print("Calling SP...")
-            # call the stored procedure
-            cursor.callproc(query_sp, args)
-            # fetch the result
-            #records = cursor.stored_results()
-            for record in cursor.stored_results():
-                #print("record--------------: ", record)
-                #print("record data---------:", record.fetchall())
-                records.append(record.fetchall())
-                #print("record row count: ", record.rowcount)
-                rowCount = record.rowcount;
-            
-            #print("records 1: ", records[0])
-            #print("record size: ", cursor.rowcount)
-            cursor.close()
-        except Exception as ex:
-            print("Exception occurred: ", ex)
-            records = ex
-        # return the result set only
-        return records[0], rowCount
     def ExecuteStoredProcedure(query_sp, args):
         records = []
         rowCount = 0
@@ -384,13 +331,6 @@ def create_app():
     def logout():
         session.clear()
         return render_template('login.html')
-
-    @app.after_request
-    def add_no_cache_headers(response):
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
-        return response
     
     # Get company manufactured device list
     @app.route('/api/get_devices')
