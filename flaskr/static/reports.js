@@ -30,7 +30,22 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("Data--------: ", data);
             //var jdata = JSON.parse(data);
             var count = data["count"];
+            console.log("Data--------: ", data);
+            //var jdata = JSON.parse(data);
+            var count = data["count"];
 
+            if(count > 0)
+            {
+                // Update the DOM with the response data (e.g., populate a table)
+                const searchBox = document.getElementById('report-search'); // Get the search box
+                console.log("Search box: ", searchBox);
+                searchBox.innerHTML = '<span class="label search">Filter Report: </span> <input type="text" id="assetNo" onkeyup="searchByAssetNo()" class="search-data" placeholder="Search by Asset No.."></input>';
+                //searchBox.innerHTML = 'xxxxx';
+                // Get the empty table element created for the report
+                const table = document.getElementById('report-table'); // Get the table element
+                // Clear existing table rows if any
+                //console.log(table); // debug purpose
+                table.innerHTML = '';
             if(count > 0)
             {
                 // Update the DOM with the response data (e.g., populate a table)
@@ -60,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 th.textContent = "Manufacturer or Model";
                 headerRow.appendChild(th);
                 const th4 = document.createElement('th');
-                th4.textContent = "Produced date";
+                th4.textContent = "Manufactured/purchased date";
                 headerRow.appendChild(th4);
                 const th5 = document.createElement('th');
                 th5.textContent = "Name";
@@ -72,16 +87,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 th7.textContent = "Type";
                 headerRow.appendChild(th7);
                 const th8 = document.createElement('th');
-                //th8.textContent = "Description";
-                //headerRow.appendChild(th8);
-                const th9 = document.createElement('th');
-                th9.textContent = "Owner";
-                headerRow.appendChild(th9);
-                const th10 = document.createElement('th');
-                th10.textContent = "Project";
-                headerRow.appendChild(th10);
+                th8.textContent = "Description";
+                headerRow.appendChild(th8);
 
-
+                /*"Serial No" : record_data[0] if len(record_data) > 0 else None,
+                        "Asset No" : record_data[1] if len(record_data) > 1 else None,
+                        "Firmware or OS" : record_data[2] if len(record_data) > 2 else None,
+                        "Manufacturer or Model" : record_data[3] if len(record_data) > 3 else None,
+                        "Manufactured-purchased date" : record_data[4] if len(record_data) > 4 else None,
+                        "Name" : record_data[5] if len(record_data) > 5 else None,
+                        "Condition" : record_data[6] if len(record_data) > 6 else None,
+                        "Type" : record_data[7] if len(record_data) > 7 else None,
+                        "Description" : record_data[8] if len(record_data) > 8 else "NA"*/
+                /*
+                // following block generated in assending order
+                for (const key in data.JsonData[0]) {
+                    console.log("TH : ", key);
+                    const th = document.createElement('th');
+                    th.textContent = key;
+                    headerRow.appendChild(th);
+                }*/
+                table.appendChild(headerRow);
                 /*"Serial No" : record_data[0] if len(record_data) > 0 else None,
                         "Asset No" : record_data[1] if len(record_data) > 1 else None,
                         "Firmware or OS" : record_data[2] if len(record_data) > 2 else None,
@@ -129,14 +155,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     cell7.textContent = record["Type"];
                     row.appendChild(cell7);
                     const cell8 = document.createElement('td');
-                    //cell8.textContent = record["Description"];
-                    //row.appendChild(cell8);
-                    const cell9 = document.createElement('td');
-                    cell9.textContent = record["Owner"];
-                    row.appendChild(cell9);
-                    const cell10 = document.createElement('td');
-                    cell10.textContent = record["Project"];
-                    row.appendChild(cell10);
+                    cell8.textContent = record["Description"];
+                    row.appendChild(cell8);
                     /*
                     // following block is generated in assending order
                     for (const key in record) {
