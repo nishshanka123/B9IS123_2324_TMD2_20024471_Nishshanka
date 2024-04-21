@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 th.textContent = "Manufacturer or Model";
                 headerRow.appendChild(th);
                 const th4 = document.createElement('th');
-                th4.textContent = "Manufactured/purchased date";
+                th4.textContent = "Produced date";
                 headerRow.appendChild(th4);
                 const th5 = document.createElement('th');
                 th5.textContent = "Name";
@@ -72,8 +72,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 th7.textContent = "Type";
                 headerRow.appendChild(th7);
                 const th8 = document.createElement('th');
-                th8.textContent = "Description";
-                headerRow.appendChild(th8);
+                //th8.textContent = "Description";
+                //headerRow.appendChild(th8);
+                const th9 = document.createElement('th');
+                th9.textContent = "Owner";
+                headerRow.appendChild(th9);
+                const th10 = document.createElement('th');
+                th10.textContent = "Project";
+                headerRow.appendChild(th10);
+
 
                 /*"Serial No" : record_data[0] if len(record_data) > 0 else None,
                         "Asset No" : record_data[1] if len(record_data) > 1 else None,
@@ -122,8 +129,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     cell7.textContent = record["Type"];
                     row.appendChild(cell7);
                     const cell8 = document.createElement('td');
-                    cell8.textContent = record["Description"];
-                    row.appendChild(cell8);
+                    //cell8.textContent = record["Description"];
+                    //row.appendChild(cell8);
+                    const cell9 = document.createElement('td');
+                    cell9.textContent = record["Owner"];
+                    row.appendChild(cell9);
+                    const cell10 = document.createElement('td');
+                    cell10.textContent = record["Project"];
+                    row.appendChild(cell10);
                     /*
                     // following block is generated in assending order
                     for (const key in record) {

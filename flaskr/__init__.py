@@ -153,11 +153,13 @@ def create_app():
                     "Asset No" : record_data[4] if len(record_data) > 4 else None,
                     "Firmware or OS" : record_data[1] if len(record_data) > 1 else None,
                     "Manufacturer or Model" : record_data[2] if len(record_data) > 2 else None,
-                    "Manufactured-purchased date" : record_data[3] if len(record_data) > 3 else None,
+                    "Manufactured-purchased date" : record_data[3].strftime('%Y-%m-%d') if len(record_data) > 3 else None,
                     "Name" : record_data[5] if len(record_data) > 5 else None,
                     "Condition" : record_data[6] if len(record_data) > 6 else None,
                     "Type" : record_data[7] if len(record_data) > 7 else None,
-                    "Description" : record_data[8] if len(record_data) > 8 else "NA"
+                    "Description" : record_data[8] if len(record_data) > 8 else "NA",
+                    "Owner" : record_data[9] if len(record_data) > 9 else "Unallocated",
+                    "Project" : record_data[10] if len(record_data) > 10 else "Not Assigned"
                 }
                 JsonData.append(FormattedRecord);
             # prepare the response
@@ -200,10 +202,9 @@ def create_app():
 
     @app.route('/api/get_device_types')
     def get_device_types():
-        category = request.args.get('category')
+        category = request.args.get('device_catagory')
         db = get_db()
         cursor = db.cursor()
-
         if category == 'all':
             cursor.execute("SELECT DISTINCT device_name, device_type FROM Device")
         else:
