@@ -376,26 +376,26 @@ function clearForm() {
     document.getElementById('assert_no').disabled = false;
     document.getElementById('device_serial').disabled = false;
 }
-function getDeviceTypesByCategory(category) {
-  // Clear the existing options in the device_type dropdown
-  var deviceTypeDropdown = document.getElementById('device_type');
-  deviceTypeDropdown.options.length = 0;
+function getDeviceNamesByCategory(category) {
+  // Clear the existing options in the device_name dropdown
+  var deviceNameDropdown = document.getElementById('device_name');
+  deviceNameDropdown.options.length = 0;
 
   // Add the 'All' option
   var allOption = document.createElement('option');
   allOption.value = 'all';
   allOption.text = 'All';
-  deviceTypeDropdown.add(allOption);
+  deviceNameDropdown.add(allOption);
 
-  // Make an request to the server-side to fetch device types based on the selected category
-  fetch(`/api/get_device_types?category=${category}`)
+  // Make an AJAX request to the server-side to fetch device names based on the selected category
+  fetch(`/api/get_device_names?category=${category}`)
       .then(response => response.json())
       .then(data => {
-          data.forEach(device => {
+          data.forEach(device_name => {
               var option = document.createElement('option');
-              option.value = device.name;
-              option.text = `${device.name} (${device.type})`;
-              deviceTypeDropdown.add(option);
+              option.value = device_name;
+              option.text = device_name;
+              deviceNameDropdown.add(option);
           });
       })
       .catch(error => {
